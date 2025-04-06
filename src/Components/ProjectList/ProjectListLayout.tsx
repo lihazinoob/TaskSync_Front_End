@@ -66,7 +66,7 @@ function ProjectListLayout() {
           {displayedProjects.length === 0 ? (
             <div>
               <p className="text-gray-600">
-                There are no projects in this category.
+                There are no projects.
               </p>
               <p className="text-gray-600">Create one to get started!</p>
             </div>

@@ -1,14 +1,13 @@
-import ProjectList from "@/Components/ProjectList/ProjectListLayout";
 
-export default function DashBoardPage() {
-  return (
+function DashBoardPage()
+{
+  return(
     <>
-      <div className="flex mt-6 gap-2  ">
-        <div className="h-full">
-          <ProjectList />
-        </div>
-        <div>This is the Project Details Section</div>
-      </div>
+    <div>
+      This is the dashboard page of a user
+    </div>
     </>
+
   );
 }
+export default DashBoardPage
