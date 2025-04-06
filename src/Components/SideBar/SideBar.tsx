@@ -31,12 +31,18 @@ const SideBar = ({ isMobile = false }: SideBarProps) => {
       {/* Menu Item Holder */}
       <div
         className={`flex ${
-          isMobile ? "flex-row space-x-4" : "flex-col mt-20 space-y-12"
+          isMobile ? "flex-row space-x-4" : "flex-col mt-20 space-y-8"
         }`}
       >
         {SideBarLinks.map((menuItem, index) => (
           <IconToopTipWrapper key={index} label={menuItem.label}>
-            <NavLink to={menuItem.path}>
+            <NavLink to={menuItem.path}
+            className={({isActive}) => 
+            `flex items-center justify-center rounded-4xl p-2 transition-colors
+            ${isActive ? 'bg-black border text-white':'hover:bg-gray-200'}
+            `
+          }
+            >
               <menuItem.icon className={isMobile ? "w-5 h-5" : "w-6 h-6"} />
             </NavLink>
           </IconToopTipWrapper>
