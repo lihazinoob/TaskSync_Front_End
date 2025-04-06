@@ -49,7 +49,7 @@ export default function ProjectDetails() {
       <div className="h-full w-full px-6">
         {/* Alert Section */}
         {showAlert && (
-          <div className="mb-4">
+          <div className="mb-4 justify-center items-center flex">
             <Alert
               variant={isStarred ? "default" : "destructive"}
               className="max-w-md border border-indigo-200 bg-indigo-50 text-indigo-800"
