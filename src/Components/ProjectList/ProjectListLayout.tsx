@@ -10,6 +10,9 @@ function ProjectListLayout() {
   // State to store the selected category
   const [selectedCategory, setSelectedcategory] = useState("Active");
 
+  // State for the search query
+  const [searchQuery, setSearchQuery] = useState("");
+
   // Group the projects by category
   const groupedProjects: { [key: string]: ProjectListDataType[] } = {
     Active: ProjectListItem.filter((project) => {
@@ -26,7 +29,19 @@ function ProjectListLayout() {
   };
 
   // get the projects accroding to the category
-  const displayedProjects = groupedProjects[selectedCategory] || [];
+  const categoryProjects = groupedProjects[selectedCategory] || [];
+
+  // Filter projects based on search query
+  const displayedProjects = categoryProjects.filter((project)=>
+    project.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+
+  // Function for the searching
+  const handleSearch = (query:string) =>
+  {
+    setSearchQuery(query);
+  }
 
   return (
     <>
@@ -37,7 +52,7 @@ function ProjectListLayout() {
 
         {/* Search Bar */}
         <div className="bg-indigo-100 h-10 w-full mt-8 rounded-4xl flex flex-row items-center gap-4">
-          <SearchBarProjectList />
+          <SearchBarProjectList onSearch = {handleSearch} />
         </div>
 
         {/* Category Tabs */}
