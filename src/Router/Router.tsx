@@ -6,6 +6,8 @@ import DashBoardPage from "@/Pages/DashBoardPage/DashBoardPage";
 import CalendarPage from "@/Pages/CalendarPage/CalendarPage";
 import MessagePage from "@/Pages/MessagePage/MessagePage";
 import NotificationPage from "@/Pages/NotificationPage/NotificationPage";
+import ProjectDetails from "@/Components/ProjectList/ProjectDetails";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -13,11 +15,18 @@ const router = createBrowserRouter([
     children:[
       {
         index:true,
-        element:<ProjectPage/>
+        element:<DashBoardPage/>
       },
       {
-        path:"/dashboard",
-        element:<DashBoardPage/>
+        path:"/project",
+        element:<ProjectPage/>,
+        children:[
+          {
+            path:":slack",
+            element:<ProjectDetails/>
+
+          }
+        ]
       },
       {
         path:"/calendar",

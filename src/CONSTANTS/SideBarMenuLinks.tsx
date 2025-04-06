@@ -9,12 +9,12 @@ export const SideBarLinks:SidebarLinkDataType[] = [
   {
     label:"Dashboard",
     icon:LayoutDashboard,
-    path:"/dashboard"
+    path:"/"
   },
   {
     label:"Project",
     icon:FolderOpen,
-    path:"/"
+    path:"/project"
   },
   {
     label:"Calender",

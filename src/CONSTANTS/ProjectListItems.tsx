@@ -1,5 +1,6 @@
 export interface ProjectListDataType {
   id: string;
+  slack:string;
   name: string;
   category: "Active" | "On Hold" | "Closed";
   techStack: "Website" | "Android" | "IOS" | "Flutter" | "React Native";
@@ -9,6 +10,7 @@ export interface ProjectListDataType {
 export const ProjectListItem: ProjectListDataType[] = [
   {
     id: "1",
+    slack:"creativesynchub",
     name: "CreativeSync Hub",
     category: "Active",
     techStack: "Website",
@@ -16,6 +18,7 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
   {
     id: "2",
+    slack:"projectflowpro",
     name: "ProjectFlow Pro",
     category: "Active",
     techStack: "Android",
@@ -23,6 +26,7 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
   {
     id: "3",
+    slack:"websyncapp",
     name: "WebSync App",
     category: "On Hold",
     techStack: "Website",
@@ -30,6 +34,7 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
   {
     id: "4",
+    slack:"blueprintnexus",
     name: "BluePrint Nexus",
     category: "On Hold",
     techStack: "IOS",
@@ -37,6 +42,7 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
   {
     id: "5",
+    slack:"visionplanpro",
     name: "VisionPlan Pro",
     category: "Closed",
     techStack: "Flutter",
@@ -44,6 +50,7 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
   {
     id: "6",
+    slack:"App Development",
     name: "App Development",
     category: "Closed",
     techStack: "Android",
@@ -51,6 +58,7 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
   {
     id: "7",
+    slack:"creativeboardcentral",
     name: "CreativeBoard Central",
     category: "Closed",
     techStack: "React Native",
@@ -58,6 +66,7 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
   {
     id: "8",
+    slack:"artisanlink",
     name: "ArtisanLink",
     category: "Closed",
     techStack: "Flutter",

@@ -75,7 +75,7 @@ function ProjectListLayout() {
               {displayedProjects.map((project) => (
                 <li key={project.id}>
                   <NavLink
-                    to={`/project/${project.id}`}
+                    to={`/project/${project.slack}`}
                     className={({ isActive }) =>
                       `flex items-center justify-between p-2 rounded-2xl ${
                         isActive
