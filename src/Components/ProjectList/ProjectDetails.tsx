@@ -4,7 +4,7 @@ import {
   ProjectListItem,
   ProjectListDataType,
 } from "@/CONSTANTS/ProjectListItems";
-import { Star } from "lucide-react";
+import { Star,Plus } from "lucide-react";
 
 export default function ProjectDetails() {
   const { slack } = useParams<{ slack: string }>();
@@ -19,6 +19,14 @@ export default function ProjectDetails() {
   function handleStarToggle() {
     setIsSStarred((prev) => !prev);
   }
+
+  // Mock data for avatars (replace with actual project data later)
+  const avatars = [
+    "https://randomuser.me/api/portraits/women/1.jpg",
+    "https://randomuser.me/api/portraits/men/2.jpg",
+    "https://randomuser.me/api/portraits/women/3.jpg",
+  ];
+  const additionalPeople = 11; // Number of additional people
 
   return (
     <>
@@ -35,15 +43,42 @@ export default function ProjectDetails() {
               {project?.techStack}/{project?.WorkType}
             </div>
           </div>
-          {/* Star options */}
 
-          <div className="items-center justify-center">
+          {/* Stars and Avatar section */}
+          <div className="flex justify-center gap-4">
+            {/* Star Opttion */}
             <button onClick={handleStarToggle} className="cursor-pointer">
-              <Star 
-              size={24}
-              className={isStarred?"fill-indigo-400 text-indigo-400 ":"text-slate-900"}
+              <Star
+                size={24}
+                className={
+                  isStarred
+                    ? "fill-indigo-400 text-indigo-400 "
+                    : "text-slate-900"
+                }
               />
             </button>
+
+            {/* Avatar Layout */}
+            <div className="items-center flex border-2  p-1 rounded-full">
+              {/* Overlapping Avatars */}
+              <div className="flex -space-x-3">
+                {avatars.map((avatar, index) => (
+                  <img
+                    src={avatar}
+                    alt={`Avatar ${index + 1}`}
+                    key={index}
+                    className="w-8 h-8 rounded-full border-2 border-white object-cover"
+                  />
+                ))}
+                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center border-2 border-white text-xs font-medium text-gray-700">
+                  +{additionalPeople}
+                </div>
+              </div>
+              {/* Add People Button */}
+              <button className="ml-2 w-8 h-8 rounded-full border-2 border-dashed border-blue-500 flex items-center justify-center cursor-pointer">
+                <Plus size={16} className="text-blue-500" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
