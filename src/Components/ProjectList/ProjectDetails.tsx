@@ -1,10 +1,12 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import {
   ProjectListItem,
   ProjectListDataType,
 } from "@/CONSTANTS/ProjectListItems";
-import { Star,Plus } from "lucide-react";
+import { Star, Plus } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+
 
 export default function ProjectDetails() {
   const { slack } = useParams<{ slack: string }>();
@@ -14,12 +16,24 @@ export default function ProjectDetails() {
 
   // state for toggling the star icon
   const [isStarred, setIsSStarred] = useState(false);
+  // State for showing the alert box
+  const [showAlert, setShowAlert] = useState(false);
 
   // function for handling the starToggle
   function handleStarToggle() {
     setIsSStarred((prev) => !prev);
+    setShowAlert(true);
   }
-
+  // useEffect hook for hiding the alert box after 2 seconds
+  useEffect(()=>{
+    if(showAlert)
+    {
+      const timer = setTimeout(()=>{
+        setShowAlert(false);
+      },2000);
+      return ()=> clearTimeout(timer);
+    }
+  },[showAlert])
   // Mock data for avatars (replace with actual project data later)
   const avatars = [
     "https://randomuser.me/api/portraits/women/1.jpg",
@@ -28,9 +42,28 @@ export default function ProjectDetails() {
   ];
   const additionalPeople = 11; // Number of additional people
 
+
+
   return (
     <>
       <div className="h-full w-full px-6">
+        {/* Alert Section */}
+        {showAlert && (
+          <div className="mb-4">
+            <Alert
+              variant={isStarred ? "default" : "destructive"}
+              className="max-w-md border border-indigo-200 bg-indigo-50 text-indigo-800"
+            >
+              <AlertTitle>{isStarred ? "Success" : "Removed"}</AlertTitle>
+              <AlertDescription>
+                {isStarred
+                  ? "This project has been added to the starred project"
+                  : "This Project has been removed from starred project"}
+              </AlertDescription>
+            </Alert>
+          </div>
+        )}
+
         {/* Header Section */}
         <div className="flex flex-row items-center justify-between">
           {/* Project Name,type and others section */}
