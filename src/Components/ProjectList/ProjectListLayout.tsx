@@ -45,7 +45,7 @@ function ProjectListLayout() {
 
   return (
     <>
-      {console.log(groupedProjects)}
+      
       <div className="h-full px-6 ">
         {/* Project List Header */}
         <div className="text-2xl font-bold ">All Projects</div>
@@ -92,9 +92,9 @@ function ProjectListLayout() {
                   <NavLink
                     to={`/project/${project.slack}`}
                     className={({ isActive }) =>
-                      `flex items-center justify-between p-2 rounded-2xl ${
+                      `flex items-center justify-between py-2 px-8 rounded-4xl ${
                         isActive
-                          ? "bg-pink-100 text-pink-800 font-medium"
+                          ? "bg-pink-100  font-medium"
                           : "text-slate-950 hover:bg-gray-200"
                       }`
                     }
