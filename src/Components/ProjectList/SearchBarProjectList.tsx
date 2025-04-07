@@ -7,12 +7,13 @@ interface SearchBarProjectListProps{
 function SearchBarProjectList({onSearch}:SearchBarProjectListProps) {
   
   // State for taking the input search query
-  const [searchQuery,setSearchQuery] = useState("");
+
 
   function handleInputChange(event:React.ChangeEvent<HTMLInputElement>)
   {
     const query = event.target.value;
-    setSearchQuery(query);
+    
+    
     onSearch(query);
   }
   

@@ -70,7 +70,7 @@ export default function ProjectDetailsBody() {
                 groupedTasks[category].map((task) => (
                   <div
                     key={task.id}
-                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+                    className="bg-white p-4 mb-6 rounded-lg shadow-sm border border-gray-200"
                   >
                     {/* Task Type */}
                     <span className="text-xs font-medium text-gray-500">
