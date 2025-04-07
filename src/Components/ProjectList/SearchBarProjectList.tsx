@@ -1,5 +1,5 @@
 import { Search } from "lucide-react";
-import {useState} from "react"
+
 interface SearchBarProjectListProps{
   onSearch:(query:string) => void
 }
