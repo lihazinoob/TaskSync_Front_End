@@ -8,7 +8,7 @@ import { Star, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 
-export default function ProjectDetails() {
+export default function ProjectDetailsHeader() {
   const { slack } = useParams<{ slack: string }>();
   const project = ProjectListItem.find(
     (p: ProjectListDataType) => p.slack === slack
@@ -46,7 +46,7 @@ export default function ProjectDetails() {
 
   return (
     <>
-      <div className="h-full w-full px-6">
+      
         {/* Alert Section */}
         {showAlert && (
           <div className="mb-4 justify-center items-center flex">
@@ -114,7 +114,7 @@ export default function ProjectDetails() {
             </div>
           </div>
         </div>
-      </div>
+      
     </>
   );
 }

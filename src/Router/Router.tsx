@@ -6,7 +6,7 @@ import DashBoardPage from "@/Pages/DashBoardPage/DashBoardPage";
 import CalendarPage from "@/Pages/CalendarPage/CalendarPage";
 import MessagePage from "@/Pages/MessagePage/MessagePage";
 import NotificationPage from "@/Pages/NotificationPage/NotificationPage";
-import ProjectDetails from "@/Components/ProjectList/ProjectDetails";
+import ProjectDetailsLayout from "@/Components/ProjectList/ProjectDetailsLayout";
 
 const router = createBrowserRouter([
   {
@@ -23,7 +23,7 @@ const router = createBrowserRouter([
         children:[
           {
             path:":slack",
-            element:<ProjectDetails/>
+            element:<ProjectDetailsLayout/>
 
           }
         ]
