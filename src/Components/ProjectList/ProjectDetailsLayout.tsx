@@ -9,7 +9,7 @@ export default function ProjectDetailsLayout() {
         </div>
 
         <div className="mt-10 flex-1 pr-6">
-          <ProjectDetailsBody />
+          <ProjectDetailsBody /> 
         </div>
       </div>
     </>

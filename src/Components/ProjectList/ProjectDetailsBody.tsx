@@ -4,16 +4,21 @@ import {
   ProjectListDataType,
   Task,
 } from "@/CONSTANTS/ProjectListItems";
-import { MessageCircle,Paperclip,UserCircle } from "lucide-react";
-
+import { MessageCircle, Paperclip, UserCircle } from "lucide-react";
+import { useState } from "react";
+import TaskDetailsSideBar from "./TaskDetailsSideBar";
 const taskCategories = ["Todo", "In Progress", "Completed"] as const;
 type TaskCategory = (typeof taskCategories)[number];
 
 export default function ProjectDetailsBody() {
+  // State for tracking which task has been clicked
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
   const { slack } = useParams<{ slack: string }>();
   const project = ProjectListItem.find(
     (p: ProjectListDataType) => p.slack === slack
   );
+
   if (!project) {
     return (
       <div className="bg-indigo-100 p-2 rounded-lg">
@@ -70,7 +75,8 @@ export default function ProjectDetailsBody() {
                 groupedTasks[category].map((task) => (
                   <div
                     key={task.id}
-                    className="bg-white p-4 mb-6 rounded-lg shadow-sm border border-gray-200"
+                    className="bg-white p-4 mb-6 rounded-lg shadow-sm border border-gray-200 cursor-pointer"
+                    onClick={() => setSelectedTask(task)}
                   >
                     {/* Task Type */}
                     <span className="text-xs font-medium text-gray-500">
@@ -114,6 +120,22 @@ export default function ProjectDetailsBody() {
           ))}
         </div>
       </div>
+
+      {/* Task Details Sidebar */}
+      {selectedTask && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/30  z-40"
+            onClick={() => setSelectedTask(null)}
+          >
+            {/* Sidebar menu item*/}
+          </div>
+          <TaskDetailsSideBar
+            task={selectedTask}
+            onClose={() => setSelectedTask(null)}
+          />
+        </>
+      )}
     </>
   );
 }
