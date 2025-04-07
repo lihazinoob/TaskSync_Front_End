@@ -7,8 +7,11 @@ function DashBoardLayout() {
         <div className="w-[100px] hidden md:block bg-indigo-50 fixed top-0 left-0 h-full ">
           <SideBar isMobile = {false}/>
         </div>
-        <div className="flex-1 md:ml-[100px] overflow-y-auto">
-          <Outlet />
+        {/* Main content area */}
+        <div className="flex-1 md:ml-[100px] flex flex-col min-h-screen">
+          <div className="flex-1">
+            <Outlet />
+          </div>
         </div>
         <div className="md:hidden  fixed bottom-0 left-0 w-full bg-indigo-50 shadow-lg">
           <SideBar isMobile= {true}/>
