@@ -1,5 +1,6 @@
 import { Task } from "@/CONSTANTS/ProjectListItems";
-import { X,CheckSquare,Square } from "lucide-react";
+import { X} from "lucide-react";
+import SubTaskinSideBar from "./SubTaskinSideBar";
 interface TaskDetailsSideBarProps {
   task: Task | null;
   onClose: () => void;
@@ -99,28 +100,11 @@ export default function TaskDetailsSideBar({
 
           {/* Subtasks */}
           <div>
-            <h3 className="text-sm font-medium text-gray-700">Sub-Tasks:</h3>
-            <ul className="mt-2 space-y-2">
-              {task.subtasks.map((subtask) => (
-                <li key={subtask.id} className="flex items-center gap-2">
-                  {subtask.completed ? (
-                    <CheckSquare size={16} className="text-pink-500" />
-                  ) : (
-                    <Square size={16} className="text-gray-400" />
-                  )}
-                  <span
-                    className={`text-sm ${
-                      subtask.completed
-                        ? "text-gray-500 line-through"
-                        : "text-gray-600"
-                    }`}
-                  >
-                    {subtask.title}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <SubTaskinSideBar task={task}/>
           </div>
+
+
+
         </div>
       </div>
     </>
