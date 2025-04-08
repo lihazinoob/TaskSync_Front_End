@@ -1,6 +1,7 @@
 import { Task, Subtask } from "@/CONSTANTS/ProjectListItems";
-import { CheckSquare, Square } from "lucide-react";
+import { CheckSquare, Square,BadgePlus } from "lucide-react";
 import { useEffect, useState } from "react";
+import AddSubTaskModal from "./AddSubTaskModal";
 interface SubTaskinSideBarProps {
   task: Task;
 }
@@ -8,6 +9,9 @@ interface SubTaskinSideBarProps {
 export default function SubTaskinSideBar({ task }: SubTaskinSideBarProps) {
   // State to track which Subtasks are completed and which are not
   const [completedSubTask, setCompletedSubTask] = useState<Subtask[]>([]);
+
+  // State to track if the modal for the Sub task add is oprn or not
+  const[isModalOpen,setIsModalOpen] = useState<boolean>(false);
 
   // useEffect hook to initialize completes subtask state when completed
   useEffect(() => {
@@ -19,12 +23,10 @@ export default function SubTaskinSideBar({ task }: SubTaskinSideBarProps) {
     ) {
       setCompletedSubTask(task.subtasks);
     }
-    
   }, [task]);
 
   // Handler function to handle the subtask toggle activity
   function toggleSubTaskCompletion(subTaskId: string) {
-    
     setCompletedSubTask((prevCompletedTask) =>
       prevCompletedTask.map((subtask) =>
         subtask.id === subTaskId
@@ -32,7 +34,11 @@ export default function SubTaskinSideBar({ task }: SubTaskinSideBarProps) {
           : subtask
       )
     );
-    
+  }
+
+  function handleAddSubTask(newSubTask:Subtask)
+  {
+    setCompletedSubTask((prev)=>[...prev,newSubTask]);
   }
 
   if (completedSubTask.length === 0) {
@@ -47,8 +53,15 @@ export default function SubTaskinSideBar({ task }: SubTaskinSideBarProps) {
   }
   return (
     <>
-      {console.log(completedSubTask)}
-      <h3 className="text-base font-medium text-slate-900">Sub-Tasks:</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-base font-medium text-slate-900">Sub-Tasks:</h3>
+        <BadgePlus 
+        size={22} 
+        className="text-emerald-700 cursor-pointer"
+        onClick={()=>setIsModalOpen(true)}
+        />
+      </div>
+
       <ul className="mt-4 space-y-2">
         {completedSubTask.map((subtask) => (
           <li
@@ -73,6 +86,13 @@ export default function SubTaskinSideBar({ task }: SubTaskinSideBarProps) {
           </li>
         ))}
       </ul>
+      {/* the add subtask modal */}
+      {isModalOpen && (
+        <AddSubTaskModal onClose={()=>setIsModalOpen(false)}
+          onAddSubtask={handleAddSubTask}
+        />
+      )}
+
     </>
   );
 }
