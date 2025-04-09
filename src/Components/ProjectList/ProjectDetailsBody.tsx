@@ -4,7 +4,8 @@ import {
   ProjectListDataType,
   Task,
   fetchProjectBySlack,
-  addSubtaskToTask
+  addSubtaskToTask,
+  updateSubTaskCompletionStatus
 } from "@/CONSTANTS/ProjectListItems";
 import { MessageCircle, Paperclip, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -56,6 +57,28 @@ export default function ProjectDetailsBody() {
     catch(err)
     {
       console.error("Failed to add subtask",err);
+    }
+  }
+
+  async function handleToggleSubtask(taskId: string, subtaskId: string, completed: boolean) {
+    if (!slack) {
+      console.error("Slack parameter is undefined");
+      return;
+    }
+
+    try {
+      await updateSubTaskCompletionStatus(slack, taskId, subtaskId, completed);
+      const updatedProject = fetchProjectBySlack(slack);
+      setProject(updatedProject);
+
+      if (selectedTask && selectedTask.id === taskId) {
+        const updatedTask = updatedProject?.tasks.find((task) => task.id === taskId);
+        if (updatedTask) {
+          setSelectedTask(updatedTask);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to toggle subtask", err);
     }
   }
 
@@ -174,6 +197,7 @@ export default function ProjectDetailsBody() {
             task={selectedTask}
             onClose={() => setSelectedTask(null)}
             onAddSubTask={handleAddSubTask}
+            onToggleSubtask = {handleToggleSubtask}
           />
         </>
       )}

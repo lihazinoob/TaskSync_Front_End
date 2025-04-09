@@ -467,7 +467,7 @@ export const updateSubTaskCompletionStatus = (
 ):Promise<void> =>{
   return new Promise((resolve,reject)=>{
     const projectIndex = ProjectListItem.findIndex((project)=>{
-      project.slack === projectSlack
+      return project.slack === projectSlack
     });
     // If there is no related project accroding to the slack,reject it
     if(projectIndex === -1)
@@ -479,7 +479,7 @@ export const updateSubTaskCompletionStatus = (
     {
       const project = ProjectListItem[projectIndex];
       const taskIndex = project.tasks.findIndex((task)=>{
-        task.id === taskId
+        return task.id === taskId
       });
       if(taskIndex === -1)
       {
@@ -489,7 +489,7 @@ export const updateSubTaskCompletionStatus = (
       else
       {
         const subTaskIndex = project.tasks[taskIndex].subtasks.findIndex((sub)=>{
-          sub.id === subTaskId
+          return sub.id === subTaskId
         });
         if (subTaskIndex === -1) {
           reject(new Error("Subtask not found"));

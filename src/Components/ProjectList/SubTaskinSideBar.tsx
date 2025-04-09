@@ -6,9 +6,10 @@ interface SubTaskinSideBarProps {
   task: Task;
   taskId:string;
   onAddSubTask:(taskId:string,newSubTask:Subtask)=> Promise<void>;
+  onToggleSubtask: (taskId: string, subtaskId: string, completed: boolean) => Promise<void>;
 }
 
-export default function SubTaskinSideBar({ task,taskId,onAddSubTask}: SubTaskinSideBarProps) {
+export default function SubTaskinSideBar({ task,taskId,onAddSubTask,onToggleSubtask}: SubTaskinSideBarProps) {
   // State to track which Subtasks are completed and which are not
   const [completedSubTask, setCompletedSubTask] = useState<Subtask[]>([]);
 
@@ -27,15 +28,35 @@ export default function SubTaskinSideBar({ task,taskId,onAddSubTask}: SubTaskinS
     }
   }, [task]);
 
-  // Handler function to handle the subtask toggle activity
-  function toggleSubTaskCompletion(subTaskId: string) {
+  async function toggleSubTaskCompletion(subTaskId: string) {
+    const subtask = completedSubTask.find((s) => s.id === subTaskId);
+    if (!subtask) return;
+
+    const newCompletedStatus = !subtask.completed;
+
+    // Optimistically update the local state
     setCompletedSubTask((prevCompletedTask) =>
       prevCompletedTask.map((subtask) =>
         subtask.id === subTaskId
-          ? { ...subtask, completed: !subtask.completed }
+          ? { ...subtask, completed: newCompletedStatus }
           : subtask
       )
     );
+
+    // Persist the change
+    try {
+      await onToggleSubtask(taskId, subTaskId, newCompletedStatus);
+    } catch (error) {
+      console.error("Failed to toggle subtask:", error);
+      // Revert the local state if the API call fails
+      setCompletedSubTask((prevCompletedTask) =>
+        prevCompletedTask.map((subtask) =>
+          subtask.id === subTaskId
+            ? { ...subtask, completed: !newCompletedStatus }
+            : subtask
+        )
+      );
+    }
   }
 
   // Handler function to add a new Subtask

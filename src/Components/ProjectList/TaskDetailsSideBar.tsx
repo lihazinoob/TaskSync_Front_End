@@ -5,12 +5,14 @@ interface TaskDetailsSideBarProps {
   task: Task | null;
   onClose: () => void;
   onAddSubTask:(taskId:string,newSubtask:Subtask)=>Promise<void>;
+  onToggleSubtask: (taskId: string, subtaskId: string, completed: boolean) => Promise<void>;
 }
 
 export default function TaskDetailsSideBar({
   task,
   onClose,
-  onAddSubTask
+  onAddSubTask,
+  onToggleSubtask
 }: TaskDetailsSideBarProps) {
   if (!task) {
     return null;
@@ -102,7 +104,9 @@ export default function TaskDetailsSideBar({
 
           {/* Subtasks */}
           <div>
-            <SubTaskinSideBar task={task} onAddSubTask={onAddSubTask} taskId={task.id}/>
+            <SubTaskinSideBar task={task} onAddSubTask={onAddSubTask} taskId={task.id}
+            onToggleSubtask = {onToggleSubtask}
+            />
           </div>
 
 
