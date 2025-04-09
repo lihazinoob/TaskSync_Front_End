@@ -31,6 +31,11 @@ export default function ProjectDetailsBody() {
   // function to habdle subtask addition which is passed to the SubTaskInSideBar
   async function handleAddSubTask(taskId:string,newSubTask:Subtask)
   {
+    if(!slack)
+    {
+      console.error("Slack Parametr is undefined");
+      return;
+    }
     try{
       await addSubtaskToTask(slack, taskId,newSubTask);
       // refetch the project to update the UI
