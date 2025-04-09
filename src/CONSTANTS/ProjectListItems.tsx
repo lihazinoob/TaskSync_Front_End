@@ -1,4 +1,3 @@
-
 export interface Subtask {
   id: string;
   title: string;
@@ -18,7 +17,6 @@ export interface Task {
   subtasks: Subtask[];
 }
 
-
 export interface ProjectListDataType {
   id: string;
   slack: string;
@@ -28,7 +26,6 @@ export interface ProjectListDataType {
   WorkType: "UI Design" | "Development" | "All";
   tasks: Task[];
 }
-
 
 export const ProjectListItem: ProjectListDataType[] = [
   {
@@ -423,10 +420,9 @@ export const ProjectListItem: ProjectListDataType[] = [
   },
 ];
 
-
-export const fetchProjectBySlack = (slack:string) => {
+export const fetchProjectBySlack = (slack: string) => {
   return ProjectListItem.find((project) => project.slack === slack);
-}
+};
 
 // Function to add a subtask to a task (simulates a PATCH request)
 export const addSubtaskToTask = (
@@ -435,7 +431,9 @@ export const addSubtaskToTask = (
   newSubtask: Subtask
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
-    const projectIndex = ProjectListItem.findIndex((p) => p.slack === projectSlack);
+    const projectIndex = ProjectListItem.findIndex(
+      (p) => p.slack === projectSlack
+    );
     if (projectIndex === -1) {
       reject(new Error("Project not found"));
       return;
@@ -458,3 +456,60 @@ export const addSubtaskToTask = (
     }, 500); // Simulate network delay
   });
 };
+
+// Function to update a subtask's completion status
+
+export const updateSubTaskCompletionStatus = (
+  projectSlack:string,
+  taskId:string,
+  subTaskId:string,
+  completed:boolean
+):Promise<void> =>{
+  return new Promise((resolve,reject)=>{
+    const projectIndex = ProjectListItem.findIndex((project)=>{
+      project.slack === projectSlack
+    });
+    // If there is no related project accroding to the slack,reject it
+    if(projectIndex === -1)
+    {
+      reject(new Error("There is no project related to the slack"));
+      return;
+    }
+    else
+    {
+      const project = ProjectListItem[projectIndex];
+      const taskIndex = project.tasks.findIndex((task)=>{
+        task.id === taskId
+      });
+      if(taskIndex === -1)
+      {
+        reject(new Error("There is no relatd task in the project"));
+        return;
+      }
+      else
+      {
+        const subTaskIndex = project.tasks[taskIndex].subtasks.findIndex((sub)=>{
+          sub.id === subTaskId
+        });
+        if (subTaskIndex === -1) {
+          reject(new Error("Subtask not found"));
+          return;
+        }
+        else{
+          // The finding is done, now update
+
+          ProjectListItem[projectIndex].tasks[taskIndex].subtasks[subTaskIndex].completed = completed;
+
+          setTimeout(() => {
+            console.log(
+              `Updated subtask ${subTaskId} in task ${taskId} in project ${projectSlack} to completed: ${completed}`
+            );
+            resolve();
+          }, 500);
+        }
+      }
+    }
+
+
+  });
+}
