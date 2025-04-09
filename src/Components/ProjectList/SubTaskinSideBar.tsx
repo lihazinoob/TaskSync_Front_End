@@ -43,8 +43,8 @@ export default function SubTaskinSideBar({ task,taskId,onAddSubTask}: SubTaskinS
   {
     try{
       await onAddSubTask(taskId,newSubTask);
-      // Update the local state tom reflect the change immidiately
-      setCompletedSubTask((prev)=>[...prev,newSubTask]);
+      // Update the local state tom reflect the change immidiately,not needed now, because it is too fast
+      // setCompletedSubTask((prev)=>[...prev,newSubTask]);
     }
     catch(error){
       console.error("Failed to add subtask",error);

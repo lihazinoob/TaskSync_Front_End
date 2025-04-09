@@ -424,6 +424,37 @@ export const ProjectListItem: ProjectListDataType[] = [
 ];
 
 
-export const fetchProjectBySlack = (slack:string): ProjectListDataType|undefined=>{
+export const fetchProjectBySlack = (slack:string) => {
   return ProjectListItem.find((project) => project.slack === slack);
 }
+
+// Function to add a subtask to a task (simulates a PATCH request)
+export const addSubtaskToTask = (
+  projectSlack: string,
+  taskId: string,
+  newSubtask: Subtask
+): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const projectIndex = ProjectListItem.findIndex((p) => p.slack === projectSlack);
+    if (projectIndex === -1) {
+      reject(new Error("Project not found"));
+      return;
+    }
+
+    const project = ProjectListItem[projectIndex];
+    const taskIndex = project.tasks.findIndex((t) => t.id === taskId);
+    if (taskIndex === -1) {
+      reject(new Error("Task not found"));
+      return;
+    }
+
+    // Update the mock data
+    ProjectListItem[projectIndex].tasks[taskIndex].subtasks.push(newSubtask);
+
+    // Simulate a backend API call (e.g., to a database)
+    setTimeout(() => {
+      console.log(`Added subtask to task ${taskId} in project ${projectSlack}`);
+      resolve();
+    }, 500); // Simulate network delay
+  });
+};

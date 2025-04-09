@@ -1,8 +1,10 @@
 import { useParams } from "react-router-dom";
 import {
+  Subtask,
   ProjectListDataType,
   Task,
-  fetchProjectBySlack
+  fetchProjectBySlack,
+  addSubtaskToTask
 } from "@/CONSTANTS/ProjectListItems";
 import { MessageCircle, Paperclip, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -24,7 +26,33 @@ export default function ProjectDetailsBody() {
     {
       setProject(fetchProjectBySlack(slack));
     }
-  },[slack])
+  },[slack]);
+
+  // function to habdle subtask addition which is passed to the SubTaskInSideBar
+  async function handleAddSubTask(taskId:string,newSubTask:Subtask)
+  {
+    try{
+      await addSubtaskToTask(slack, taskId,newSubTask);
+      // refetch the project to update the UI
+      const updatedProject = fetchProjectBySlack(slack);
+      setProject(updatedProject);
+
+      // Update the selected task 
+      if(selectedTask && selectedTask.id === taskId)
+      {
+        const updatedTask = updatedProject?.tasks.find((task)=> task.id === taskId);
+        if(updatedTask)
+        {
+          setSelectedTask(updatedTask);
+        }
+      }
+
+    }
+    catch(err)
+    {
+      console.error("Failed to add subtask",err);
+    }
+  }
 
   if (!project) {
     return (
@@ -140,6 +168,7 @@ export default function ProjectDetailsBody() {
           <TaskDetailsSideBar
             task={selectedTask}
             onClose={() => setSelectedTask(null)}
+            onAddSubTask={handleAddSubTask}
           />
         </>
       )}
