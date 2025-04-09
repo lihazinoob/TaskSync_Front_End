@@ -1,14 +1,16 @@
-import { Task } from "@/CONSTANTS/ProjectListItems";
+import { Subtask, Task } from "@/CONSTANTS/ProjectListItems";
 import { X} from "lucide-react";
 import SubTaskinSideBar from "./SubTaskinSideBar";
 interface TaskDetailsSideBarProps {
   task: Task | null;
   onClose: () => void;
+  onAddSubTask:(taskId:string,newSubtask:Subtask)=>Promise<void>;
 }
 
 export default function TaskDetailsSideBar({
   task,
   onClose,
+  onAddSubTask
 }: TaskDetailsSideBarProps) {
   if (!task) {
     return null;
@@ -100,7 +102,7 @@ export default function TaskDetailsSideBar({
 
           {/* Subtasks */}
           <div>
-            <SubTaskinSideBar task={task}/>
+            <SubTaskinSideBar task={task} onAddSubTask={onAddSubTask} taskId={task.id}/>
           </div>
 
 

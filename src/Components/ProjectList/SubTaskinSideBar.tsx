@@ -4,9 +4,11 @@ import { useEffect, useState } from "react";
 import AddSubTaskModal from "./AddSubTaskModal";
 interface SubTaskinSideBarProps {
   task: Task;
+  taskId:string;
+  onAddSubTask:(taskId:string,newSubTask:Subtask)=> Promise<void>;
 }
 
-export default function SubTaskinSideBar({ task }: SubTaskinSideBarProps) {
+export default function SubTaskinSideBar({ task,taskId,onAddSubTask}: SubTaskinSideBarProps) {
   // State to track which Subtasks are completed and which are not
   const [completedSubTask, setCompletedSubTask] = useState<Subtask[]>([]);
 
@@ -36,9 +38,17 @@ export default function SubTaskinSideBar({ task }: SubTaskinSideBarProps) {
     );
   }
 
-  function handleAddSubTask(newSubTask:Subtask)
+  // Handler function to add a new Subtask
+  async function handleAddSubTask(newSubTask:Subtask)
   {
-    setCompletedSubTask((prev)=>[...prev,newSubTask]);
+    try{
+      await onAddSubTask(taskId,newSubTask);
+      // Update the local state tom reflect the change immidiately
+      setCompletedSubTask((prev)=>[...prev,newSubTask]);
+    }
+    catch(error){
+      console.error("Failed to add subtask",error);
+    }
   }
 
   if (completedSubTask.length === 0) {

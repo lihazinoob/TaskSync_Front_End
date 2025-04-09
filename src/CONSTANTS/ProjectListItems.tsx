@@ -422,3 +422,8 @@ export const ProjectListItem: ProjectListDataType[] = [
     ],
   },
 ];
+
+
+export const fetchProjectBySlack = (slack:string): ProjectListDataType|undefined=>{
+  return ProjectListItem.find((project) => project.slack === slack);
+}

@@ -1,11 +1,11 @@
 import { useParams } from "react-router-dom";
 import {
-  ProjectListItem,
   ProjectListDataType,
   Task,
+  fetchProjectBySlack
 } from "@/CONSTANTS/ProjectListItems";
 import { MessageCircle, Paperclip, UserCircle } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TaskDetailsSideBar from "./TaskDetailsSideBar";
 const taskCategories = ["Todo", "In Progress", "Completed"] as const;
 type TaskCategory = (typeof taskCategories)[number];
@@ -13,11 +13,18 @@ type TaskCategory = (typeof taskCategories)[number];
 export default function ProjectDetailsBody() {
   // State for tracking which task has been clicked
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  // State or Local data to track which project is opened
+  const[project,setProject] = useState<ProjectListDataType|undefined>(undefined);
 
   const { slack } = useParams<{ slack: string }>();
-  const project = ProjectListItem.find(
-    (p: ProjectListDataType) => p.slack === slack
-  );
+  
+  // when the component mounts or the slack changes the function fetchProjectBySlack is called
+  useEffect(()=>{
+    if(slack)
+    {
+      setProject(fetchProjectBySlack(slack));
+    }
+  },[slack])
 
   if (!project) {
     return (
