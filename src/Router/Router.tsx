@@ -7,7 +7,7 @@ import CalendarPage from "@/Pages/CalendarPage/CalendarPage";
 import MessagePage from "@/Pages/MessagePage/MessagePage";
 import NotificationPage from "@/Pages/NotificationPage/NotificationPage";
 import ProjectDetailsLayout from "@/Components/ProjectList/ProjectDetailsLayout";
-import SignUpLayout from "@/Layout/SignUp/SignUpLayout";
+import AuthLayout from "@/Layout/Auth/AuthLayout";
 
 const router = createBrowserRouter([
   // This path or route is for dashboard layout
@@ -52,7 +52,7 @@ const router = createBrowserRouter([
   // This path or route is for SignUp layout
   {
     path:"/register",
-    element:<SignUpLayout/>
+    element:<AuthLayout/>
   }
 ]);
 
