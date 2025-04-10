@@ -52,7 +52,7 @@ export default function AddSubtaskModal({ onClose, onAddSubtask }: AddSubtaskMod
       <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 w-96 z-50">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-slate-900">Add New Subtask</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 cursor-pointer">
             <X size={24} />
           </button>
         </div>
@@ -123,7 +123,7 @@ export default function AddSubtaskModal({ onClose, onAddSubtask }: AddSubtaskMod
               onChange={(e) => setDescription(e.target.value)}
               className="mt-1 w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="Enter description"
-              rows={3}
+              rows={5}
             />
           </div>
 
