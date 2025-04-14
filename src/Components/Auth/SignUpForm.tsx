@@ -3,6 +3,7 @@ import GoogleIcon from "../../assets/GoogleIcon.svg";
 import { useRef, useState } from "react";
 import { useAuth } from "@/Context/AuthContext";
 import { useNavigate } from "react-router-dom";
+
 interface RegistrationUserDataType {
   username: string;
   email: string;
@@ -104,8 +105,9 @@ export default function SignUpForm() {
 
   return (
     <>
-      <div className="space-y-4">
-        <form onSubmit={handleSubmit}>
+    {console.log(errors)} 
+      <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* UserName */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
