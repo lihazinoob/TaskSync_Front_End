@@ -3,7 +3,7 @@ import GoogleIcon from "../../assets/GoogleIcon.svg"
 export default function LoginForm() {
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Email ID */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

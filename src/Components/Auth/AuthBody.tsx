@@ -9,7 +9,7 @@ export default function AuthBody() {
   return (
     <>
       {console.log(activeTab)}
-      <div className="w-full max-w-md px-8 py-16">
+      <div className="w-full max-w-md px-8 py-8">
         {/* Logo */}
         <div className="flex items-center justify-start mb-4 gap-2">
           <img src={CompanyLogo} alt="" />

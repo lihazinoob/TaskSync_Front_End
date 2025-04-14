@@ -3,7 +3,7 @@ import GoogleIcon from "../../assets/GoogleIcon.svg";
 export default function SignUpForm() {
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* UserName */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -52,7 +52,7 @@ export default function SignUpForm() {
 
         <div className="flex flex-row items-center justify-center">
           <div className="border-2 border-slate-200 px-4 py-1 rounded-lg cursor-pointer">
-            <img src={GoogleIcon} alt="icon-google" />
+            <img src={GoogleIcon} alt="icon-google" className="w-10 h-10" />
           </div>
         </div>
       </div>
