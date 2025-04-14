@@ -1,8 +1,9 @@
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useEffect, useState,useContext} from "react";
 import api, { setAccessToken } from "../Context/axios";
 interface AuthContextType {
   accessToken: string | null;
   isAuthenticated: boolean;
+  login:(token:string)=>void
 }
 
 // Creating the context first
@@ -30,4 +31,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
     initializeAuth();
   }, []);
+
+  const login = (token:string) =>{
+    setAccessTokenState(token);
+    setAccessToken(token);
+    setIsAuthenticated(true);
+  }
+
+  return (
+    <AuthContext.Provider value={{ accessToken, isAuthenticated,login }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
+
+// Wrapper function to use AuthProvider
+export const useAuth = ()=>{
+  const context = useContext(AuthContext); 
+  if(!context)
+  {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }  
+  return context;
+}
