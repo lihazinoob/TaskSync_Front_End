@@ -1,8 +1,13 @@
-import axios from "axios";
-import { access } from "fs";
+import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 
+
+
+
+interface ApiError extends AxiosError<unknown, any> {
+  response?: AxiosResponse; // Optional response
+}
 // Creating an axios instance
-const api = axios.create({
+const api:AxiosInstance = axios.create({
   baseURL: "http://localhost:8000/api",
   headers: {
     "Content-Type": "application/json",
@@ -10,17 +15,19 @@ const api = axios.create({
   withCredentials: true,
 });
 
-let accessToken = null;
+let accessToken:string|null = null;
 
 // Request interceptor to add the access token to the headers
 
 api.interceptors.request.use(
-  (config) => {
-    if (accessToken && config.url !== "/refresh") {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    if (accessToken && config.url !== '/refresh') {
+      config.headers = config.headers || {};
+      config.headers.set('Authorization', `Bearer ${accessToken}`); // Use set() for AxiosHeaders
     }
+    return config;
   },
-  (error) => Promise.reject(error)
+  (error: ApiError): Promise<never> => Promise.reject(error)
 );
 
 // Response Interceptor to handle token expiration
@@ -51,6 +58,8 @@ api.interceptors.response.use(
 );
 
 // Function to set the access token in memory
-export const setAccessToken = (token) => {
+export const setAccessToken = (token:string|null):void => {
   accessToken = token;
 }
+
+export default api;
