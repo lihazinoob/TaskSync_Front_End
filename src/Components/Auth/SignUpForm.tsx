@@ -36,6 +36,7 @@ export default function SignUpForm() {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   function validateForm() {
+    
     const newErrors: FormErrors = {};
     // Validate the username
     const username = usernameRef.current?.value.trim();
@@ -64,6 +65,7 @@ export default function SignUpForm() {
     }
 
     setErrors(newErrors);
+    console.log(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
@@ -72,7 +74,7 @@ export default function SignUpForm() {
     e.preventDefault();
 
     // Validate the form before submission
-    if(!validateForm)
+    if(!validateForm())
     {
       return;
     }
@@ -105,9 +107,9 @@ export default function SignUpForm() {
 
   return (
     <>
-    {console.log(errors)} 
+     
       <div className="space-y-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {/* UserName */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -143,7 +145,7 @@ export default function SignUpForm() {
                   : "border-gray-300 focus:ring-blue-500"
               }`}
             />
-            {errors.email && errors.username && errors.password && (
+            {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email}</p>
             )}
           </div>
