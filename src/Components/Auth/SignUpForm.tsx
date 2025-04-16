@@ -65,7 +65,7 @@ export default function SignUpForm() {
     }
 
     setErrors(newErrors);
-    console.log(newErrors);
+    // console.log(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
@@ -178,7 +178,7 @@ export default function SignUpForm() {
             type="submit"
             disabled={loading}
           >
-            {loading?"Create Accounting Account...":"Create Account"}
+            {loading?"Creating Account...":"Create Account"}
           </button>
         </form>
 
