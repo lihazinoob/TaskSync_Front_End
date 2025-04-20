@@ -2,7 +2,8 @@ import CompanyLogo from "../../assets/CompanyLogo.svg";
 import { useState } from "react";
 import SignUpForm from "./SignUpForm";
 import LoginForm from "./LoginForm";
-export default function AuthBody() {
+import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
+export default function AuthBody({triggerOnBoarding}:AuthLayoutProps) {
   // State to track which button is active
   const [activeTab, setActiveTab] = useState<"signup" | "signin">("signup");
 
@@ -41,7 +42,7 @@ export default function AuthBody() {
         </div>
 
         <div className="py-8">
-          {activeTab === "signup" ? <SignUpForm/> : <LoginForm/>}
+          {activeTab === "signup" ? <SignUpForm triggerOnBoarding = {triggerOnBoarding}/> : <LoginForm/>}
 
         </div>
       </div>

@@ -1,6 +1,11 @@
 import AuthImage from "@/Components/Auth/AuthImage";
 import AuthBody from "@/Components/Auth/AuthBody";
-export default function AuthLayout()
+
+export interface AuthLayoutProps{
+  triggerOnBoarding: ()=>void
+}
+
+export default function AuthLayout({triggerOnBoarding}:AuthLayoutProps)
 {
   return(
     <>
@@ -10,7 +15,7 @@ export default function AuthLayout()
           <AuthImage/>
         </div>
         <div className="flex-1/2">
-          <AuthBody/>
+          <AuthBody triggerOnBoarding = {triggerOnBoarding}/>
         </div>
       </div>
       

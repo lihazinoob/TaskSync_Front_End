@@ -2,7 +2,8 @@ import api from "@/Context/axios";
 import GoogleIcon from "../../assets/GoogleIcon.svg";
 import { useRef, useState } from "react";
 import { useAuth } from "@/Context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
+
 
 interface RegistrationUserDataType {
   username: string;
@@ -19,9 +20,9 @@ interface FormErrors {
 
 // Validation function which validates the user data before sending to the backend
 
-export default function SignUpForm() {
+export default function SignUpForm({triggerOnBoarding}:AuthLayoutProps) {
   const { login } = useAuth();
-  const navigate = useNavigate();
+  
 
   // Refs for user data field
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -32,6 +33,7 @@ export default function SignUpForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   // State for showing the "loading message"
   const [loading,setLoading] = useState<boolean>(false);
+  
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -91,19 +93,22 @@ export default function SignUpForm() {
     try{
       const { data } = await api.post("/register",formData);
       login(data.access_token);
-      navigate("/");
-      // alert("registration Successfull");
+      // call the triggerOnBoarding function here to trigger the onboarding screen
+      triggerOnBoarding();
       if (usernameRef.current) usernameRef.current.value = "";
       if (emailRef.current) emailRef.current.value = "";
       if (passwordRef.current) passwordRef.current.value = "";
+
+      
     }
     catch (err: any) {
       setErrors({ email: err.response?.data?.error || "Failed to register" });
     } finally {
       setLoading(false);
     }
-
   }
+
+  
 
   return (
     <>
