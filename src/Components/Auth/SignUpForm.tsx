@@ -92,7 +92,7 @@ export default function SignUpForm() {
       const { data } = await api.post("/register",formData);
       login(data.access_token);
       navigate("/");
-      alert("registration Successfull");
+      // alert("registration Successfull");
       if (usernameRef.current) usernameRef.current.value = "";
       if (emailRef.current) emailRef.current.value = "";
       if (passwordRef.current) passwordRef.current.value = "";

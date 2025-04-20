@@ -1,5 +1,8 @@
+import api from "@/Context/axios";
 import GoogleIcon from "../../assets/GoogleIcon.svg";
-import { useRef, useState } from "react";
+import { useRef, useState, } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/Context/AuthContext";
 interface LoginUserDataType{
   email:string;
   password:string
@@ -11,6 +14,8 @@ interface FormErrors {
   password?: string;
 }
 export default function LoginForm() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
@@ -44,15 +49,44 @@ export default function LoginForm() {
 
 
   // Function to handle the login form submission
-  async function handleSubmit()
+  async function handleSubmit(e:React.FormEvent)
   {
+    e.preventDefault();
+
     if(!validateForm())
     {
       return
     }
     else
     {
+      setLoading(true);
+      setErrors({});
 
+    }
+
+    const formData:LoginUserDataType = {
+      email: emailRef.current!.value,
+      password: passwordRef.current!.value,
+    }
+
+    try{
+      const { data } = await api.post("/login",formData);
+      login(data.access_token);
+      navigate('/');
+      // Emotying the user field after succesfull login process
+      if(emailRef.current)
+      {
+        emailRef.current.value = "";
+      }
+      if(passwordRef.current)
+      {
+        passwordRef.current.value = "";
+      }
+    }
+    catch (err: any) {
+      setErrors({ email: err.response?.data?.error || "Failed to register" });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -114,9 +148,9 @@ export default function LoginForm() {
 
           {/* Sign In Button */}
           <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer mt-4"
-          type="submit"
+          type="submit" disabled={loading}
           >
-            Sign In
+            {loading?"Signing In":"Sign IN"}
           </button>
         </form>
 
