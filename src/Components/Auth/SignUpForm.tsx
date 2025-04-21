@@ -1,9 +1,8 @@
 import api from "@/Context/axios";
-import GoogleIcon from "../../assets/GoogleIcon.svg";
-import { useRef, useState } from "react";
+import GitHubIcon from "../../assets/GitHubIcon.svg";
+import { useRef, useState,useEffect } from "react";
 import { useAuth } from "@/Context/AuthContext";
 import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
-
 
 interface RegistrationUserDataType {
   username: string;
@@ -20,9 +19,8 @@ interface FormErrors {
 
 // Validation function which validates the user data before sending to the backend
 
-export default function SignUpForm({triggerOnBoarding}:AuthLayoutProps) {
+export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
   const { login } = useAuth();
-  
 
   // Refs for user data field
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -32,30 +30,24 @@ export default function SignUpForm({triggerOnBoarding}:AuthLayoutProps) {
   // State for error message
   const [errors, setErrors] = useState<FormErrors>({});
   // State for showing the "loading message"
-  const [loading,setLoading] = useState<boolean>(false);
-  
+  const [loading, setLoading] = useState<boolean>(false);
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   function validateForm() {
-    
     const newErrors: FormErrors = {};
     // Validate the username
     const username = usernameRef.current?.value.trim();
-    if(!username)
-    {
+    if (!username) {
       newErrors.username = "Username is required";
     }
 
     // validate the email
     const email = emailRef.current?.value.trim();
-    if(!email)
-    {
+    if (!email) {
       newErrors.email = "Email is Required";
-    }
-    else if(!emailRegex.test(email))
-    {
-      newErrors.email = "Invalid Email Format"
+    } else if (!emailRegex.test(email)) {
+      newErrors.email = "Invalid Email Format";
     }
 
     // Validate the password
@@ -71,13 +63,60 @@ export default function SignUpForm({triggerOnBoarding}:AuthLayoutProps) {
     return Object.keys(newErrors).length === 0;
   }
 
+  async function handleGitHubAuth() {
+    try {
+      setLoading(true);
+      const { data } = await api.get("/auth/github");
+      window.location.href = data.url;
+    } catch (error:any) {
+      setErrors({
+        email:"Failed to initiate GitHub Authentication"
+      });
+      setLoading(false);
+    }
+  }
+
+
+  // Handle GitHub callback
+  useEffect(() => {
+    console.log('SignUpForm useEffect triggered');
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    console.log('OAuth Code:', code);
+    if (code) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      const handleGitHubCallback = async () => {
+        try {
+          console.log('Calling /api/auth/github/callback with code:', code);
+          setLoading(true);
+          const { data } = await api.get("/auth/github/callback", {
+            params: { code },
+          });
+          console.log('GitHub Callback Response:', data);
+          login(data.access_token);
+          console.log('Triggering onboarding...');
+          triggerOnBoarding();
+          
+        } catch (err: any) {
+          console.error('GitHub Callback Error:', err);
+          setErrors({ email: err.response?.data?.message || "GitHub authentication failed" });
+        } finally {
+          setLoading(false);
+          console.log('Loading state set to false');
+        }
+      };
+      handleGitHubCallback();
+    } else {
+      console.log('No OAuth code found in URL');
+    }
+  }, [login, triggerOnBoarding]);
+
   // the handler function to handle the submission logic
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     // Validate the form before submission
-    if(!validateForm())
-    {
+    if (!validateForm()) {
       return;
     }
 
@@ -90,29 +129,23 @@ export default function SignUpForm({triggerOnBoarding}:AuthLayoutProps) {
       password: passwordRef.current!.value,
     };
 
-    try{
-      const { data } = await api.post("/register",formData);
+    try {
+      const { data } = await api.post("/register", formData);
       login(data.access_token);
       // call the triggerOnBoarding function here to trigger the onboarding screen
       triggerOnBoarding();
       if (usernameRef.current) usernameRef.current.value = "";
       if (emailRef.current) emailRef.current.value = "";
       if (passwordRef.current) passwordRef.current.value = "";
-
-      
-    }
-    catch (err: any) {
+    } catch (err: any) {
       setErrors({ email: err.response?.data?.error || "Failed to register" });
     } finally {
       setLoading(false);
     }
   }
 
-  
-
   return (
     <>
-     
       <div className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* UserName */}
@@ -183,7 +216,7 @@ export default function SignUpForm({triggerOnBoarding}:AuthLayoutProps) {
             type="submit"
             disabled={loading}
           >
-            {loading?"Creating Account...":"Create Account"}
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 
@@ -192,8 +225,11 @@ export default function SignUpForm({triggerOnBoarding}:AuthLayoutProps) {
         {/* Google Icon */}
 
         <div className="flex flex-row items-center justify-center">
-          <div className="border-2 border-slate-200 px-4 py-1 rounded-lg cursor-pointer">
-            <img src={GoogleIcon} alt="icon-google" className="w-10 h-10" />
+          <div
+            className="border-2 border-slate-200 px-4 py-1 rounded-lg cursor-pointer"
+            onClick={handleGitHubAuth}
+          >
+            <img src={GitHubIcon} alt="icon-google" className="w-10 h-10" />
           </div>
         </div>
       </div>
