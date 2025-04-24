@@ -90,7 +90,7 @@ function ProjectListLayout() {
               {displayedProjects.map((project) => (
                 <li key={project.id}>
                   <NavLink
-                    to={`/project/${project.slack}`}
+                    to={`/dashboard/project/${project.slack}`}
                     className={({ isActive }) =>
                       `flex items-center justify-between py-2 px-8 rounded-4xl ${
                         isActive

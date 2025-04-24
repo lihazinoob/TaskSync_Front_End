@@ -34,6 +34,7 @@ export default function AuthWrapper() {
 
   return (
     <>
+    
       {showOnBoarding ? (
         <SignUpOnBoardingScreen />
       ) : (

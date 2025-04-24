@@ -33,6 +33,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = (token:string) =>{
+    console.log('AuthProvider - Logging in with token:', token);
     setAccessTokenState(token);
     setAccessToken(token);
     setIsAuthenticated(true);

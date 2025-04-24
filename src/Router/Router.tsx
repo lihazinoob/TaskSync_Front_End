@@ -1,7 +1,7 @@
 import StatsPage from "@/Pages/StatsPage/StatsPage";
 import { createBrowserRouter } from "react-router-dom";
 import DashBoardLayout from "@/Layout/DashBoard/DashBoardLayout";
-import ProjectPage from "@/Pages/ProjectPage/ProjectPage"; 
+import ProjectPage from "@/Pages/ProjectPage/ProjectPage";
 import DashBoardPage from "@/Pages/DashBoardPage/DashBoardPage";
 import CalendarPage from "@/Pages/CalendarPage/CalendarPage";
 import MessagePage from "@/Pages/MessagePage/MessagePage";
@@ -9,57 +9,74 @@ import NotificationPage from "@/Pages/NotificationPage/NotificationPage";
 import ProjectDetailsLayout from "@/Components/ProjectList/ProjectDetailsLayout";
 import AuthWrapper from "@/Components/Auth/AuthWrapper";
 import AuthCallBack from "@/Components/Auth/AuthCallBack";
+import DefaultLayout from "@/Layout/DefaultLayout/DefaultLayout";
+import ProtectedRoute from "@/Layout/ProtectedLayout/ProtectedLayout";
 
 const router = createBrowserRouter([
-  // This path or route is for dashboard layout
   {
     path: "/",
-    element: <DashBoardLayout/>,
-    children:[
+    element: <DefaultLayout />,
+    children: [
       {
-        index:true,
-        element:<DashBoardPage/>
+        index: true,
+        element: <AuthWrapper />,
       },
       {
-        path:"/project",
-        element:<ProjectPage/>,
+        path: "/auth/callback",
+        element: <AuthCallBack />,
+      },
+      // // This path or route is for SignUp layout
+      {
+        path: "/register",
+        element: <AuthWrapper />,
+      },
+    ],
+  },
+
+  // This path or route is for dashboard layout
+  {
+    path: "/dashboard",
+    element: <ProtectedRoute />,
+    children: [
+      {  
+        element: <DashBoardLayout />,
         children:[
           {
-            path:":slack",
-            element:<ProjectDetailsLayout/>
-
-          }
+            index:true,
+            element:<DashBoardPage/>
+          },
+          {
+            path: "project",
+            element: <ProjectPage />,
+            children: [
+              {
+                path: ":slack",
+                element: <ProjectDetailsLayout />,
+              },
+            ],
+          },
         ]
       },
-      {
-        path:"/calendar",
-        element:<CalendarPage/>
-      },
-      {
-        path:"/stats",
-        element:<StatsPage/>
-      },
-      {
-        path:"/chats",
-        element:<MessagePage/>
-      },
-      {
-        path:"/notification",
-        element:<NotificationPage/>
 
-      }
-    ]
+      
+      // {
+      //   path: "/calendar",
+      //   element: <CalendarPage />,
+      // },
+      // {
+      //   path: "/stats",
+      //   element: <StatsPage />,
+      // },
+      // {
+      //   path: "/chats",
+      //   element: <MessagePage />,
+      // },
+      // {
+      //   path: "/notification",
+      //   element: <NotificationPage />,
+      // },
+    ],
   },
-  // This path or route is for SignUp layout
-  {
-    path:"/register",
-    element:<AuthWrapper/>
-  },
-  {
-    path:'/auth/callback',
-    element:<AuthCallBack/>
-  }
-  
 ]);
 
 export default router;
