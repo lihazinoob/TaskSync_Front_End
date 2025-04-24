@@ -1,17 +1,19 @@
 import api from "@/Context/axios";
-import GoogleIcon from "../../assets/GoogleIcon.svg";
-import { useRef, useState, } from "react";
+import GitHubIcon from "../../assets/GitHubIcon.svg";
+import { useRef, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/Context/AuthContext";
-interface LoginUserDataType{
-  email:string;
-  password:string
+
+interface LoginUserDataType {
+  email: string;
+  password: string;
 }
 
 // Interface for form errors
 interface FormErrors {
   email?: string;
   password?: string;
+  github?: string;
 }
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -21,84 +23,86 @@ export default function LoginForm() {
   const passwordRef = useRef<HTMLInputElement>(null);
 
   //State for storing the errors
-  const [errors,setErrors] = useState<FormErrors>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   // State for storing the loading state
-  const [loading,setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Function to handle the form validation
-  function validateForm()
-  {
-    const newErrors:FormErrors = {};
+  function validateForm() {
+    const newErrors: FormErrors = {};
     const email = emailRef.current?.value.trim();
-    if(!email)
-    {
+    if (!email) {
       newErrors.email = "A valid email is required";
     }
     const password = passwordRef.current?.value.trim();
-    if(!password)
-    {
-      newErrors.password = "Password is required"
-    }
-    else if(password.length < 8)
-    {
+    if (!password) {
+      newErrors.password = "Password is required";
+    } else if (password.length < 8) {
       newErrors.password = "Password must be at least 8 characters long";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
+  // Function to handle github authentication for logging in the user into the system
+  async function handleGitHubAuth() {
+    try {
+      setLoading(true);
+      const { data } = await api.get("/auth/github", {
+        params: {
+          redirect: `${window.location.origin}/auth/callback`,
+          state: "login",
+        },
+      });
+      console.log("Redirecting to GitHub:", data.url);
+      window.location.href = data.url;
+    } catch (error: any) {
+      console.error("GitHub Auth Error:", error);
+      setErrors({
+        github: "Failed to initiate GitHub Authentication",
+      });
+      setLoading(false);
+    }
+  }
 
   // Function to handle the login form submission
-  async function handleSubmit(e:React.FormEvent)
-  {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if(!validateForm())
-    {
-      return
-    }
-    else
-    {
+    if (!validateForm()) {
+      return;
+    } else {
       setLoading(true);
       setErrors({});
-
     }
 
-    const formData:LoginUserDataType = {
+    const formData: LoginUserDataType = {
       email: emailRef.current!.value,
       password: passwordRef.current!.value,
-    }
+    };
 
-    try{
-      const { data } = await api.post("/login",formData);
+    try {
+      const { data } = await api.post("/login", formData);
       login(data.access_token);
-      navigate('/');
+      navigate("/");
       // Emotying the user field after succesfull login process
-      if(emailRef.current)
-      {
+      if (emailRef.current) {
         emailRef.current.value = "";
       }
-      if(passwordRef.current)
-      {
+      if (passwordRef.current) {
         passwordRef.current.value = "";
       }
-    }
-    catch (err: any) {
+    } catch (err: any) {
       setErrors({ email: err.response?.data?.error || "Failed to register" });
     } finally {
       setLoading(false);
     }
   }
 
-
-
-
-
   return (
     <>
       <div className="space-y-6">
         <form className="space-y-4" onSubmit={handleSubmit}>
-
           {/* Email ID */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -147,10 +151,12 @@ export default function LoginForm() {
           </div>
 
           {/* Sign In Button */}
-          <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer mt-4"
-          type="submit" disabled={loading}
+          <button
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer mt-4"
+            type="submit"
+            disabled={loading}
           >
-            {loading?"Signing In":"Sign IN"}
+            {loading ? "Signing In" : "Sign IN"}
           </button>
         </form>
 
@@ -159,8 +165,11 @@ export default function LoginForm() {
         {/* Google Icon */}
 
         <div className="flex flex-row items-center justify-center">
-          <div className="border-2 border-slate-200 px-4 py-1 rounded-lg cursor-pointer">
-            <img src={GoogleIcon} alt="icon-google" />
+          <div
+            className="border-2 border-slate-200 px-4 py-1 rounded-lg cursor-pointer"
+            onClick={handleGitHubAuth}
+          >
+            <img src={GitHubIcon} alt="icon-google" />
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ import MessagePage from "@/Pages/MessagePage/MessagePage";
 import NotificationPage from "@/Pages/NotificationPage/NotificationPage";
 import ProjectDetailsLayout from "@/Components/ProjectList/ProjectDetailsLayout";
 import AuthWrapper from "@/Components/Auth/AuthWrapper";
-
+import AuthCallBack from "@/Components/Auth/AuthCallBack";
 
 const router = createBrowserRouter([
   // This path or route is for dashboard layout
@@ -55,6 +55,10 @@ const router = createBrowserRouter([
     path:"/register",
     element:<AuthWrapper/>
   },
+  {
+    path:'/auth/callback',
+    element:<AuthCallBack/>
+  }
   
 ]);
 

@@ -1,6 +1,6 @@
 import api from "@/Context/axios";
 import GitHubIcon from "../../assets/GitHubIcon.svg";
-import { useRef, useState,useEffect } from "react";
+import { useRef, useState} from "react";
 import { useAuth } from "@/Context/AuthContext";
 import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
 
@@ -66,50 +66,24 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
   async function handleGitHubAuth() {
     try {
       setLoading(true);
-      const { data } = await api.get("/auth/github");
+      const { data } = await api.get("/auth/github", {
+        params: {
+          redirect: `${window.location.origin}/auth/callback`,
+          state: "signup",
+        },
+      });
+      console.log("Redirecting to GitHub:", data.url);
       window.location.href = data.url;
-    } catch (error:any) {
+    } catch (error: any) {
+      console.error("GitHub Auth Error:", error);
       setErrors({
-        email:"Failed to initiate GitHub Authentication"
+        email: "Failed to initiate GitHub Authentication",
       });
       setLoading(false);
     }
   }
 
-
-  // Handle GitHub callback
-  useEffect(() => {
-    console.log('SignUpForm useEffect triggered');
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-    console.log('OAuth Code:', code);
-    if (code) {
-      window.history.replaceState({}, document.title, window.location.pathname);
-      const handleGitHubCallback = async () => {
-        try {
-          console.log('Calling /api/auth/github/callback with code:', code);
-          setLoading(true);
-          const { data } = await api.get("/auth/github/callback", {
-            params: { code },
-          });
-          console.log('GitHub Callback Response:', data);
-          login(data.access_token);
-          console.log('Triggering onboarding...');
-          triggerOnBoarding();
-          
-        } catch (err: any) {
-          console.error('GitHub Callback Error:', err);
-          setErrors({ email: err.response?.data?.message || "GitHub authentication failed" });
-        } finally {
-          setLoading(false);
-          console.log('Loading state set to false');
-        }
-      };
-      handleGitHubCallback();
-    } else {
-      console.log('No OAuth code found in URL');
-    }
-  }, [login, triggerOnBoarding]);
+  
 
   // the handler function to handle the submission logic
   async function handleSubmit(e: React.FormEvent) {
