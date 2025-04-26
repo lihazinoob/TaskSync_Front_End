@@ -1,4 +1,3 @@
-import { useAuth } from "@/Context/AuthContext";
 import api from "@/Context/axios";
 import { useState, useEffect } from "react";
 export interface Subtask {
@@ -71,8 +70,9 @@ export const fetchProjects = async (): Promise<ProjectListDataType[]> => {
 // Create a Project
 export const createProject = async (
   projectData: Omit<ProjectListDataType, "id" | "slack" | "tasks">
-): Promise<void> => {
+): Promise<ProjectListDataType> => {
   try {
+    console.log("createProject function called");
     // Sending the data over the backend
     const response = await api.post("/createProject", {
       name: projectData.name,
@@ -82,7 +82,7 @@ export const createProject = async (
     });
 
     const newProject = response.data.data;
-    projectList.push({
+    const projectToAdd: ProjectListDataType = {
       id: newProject.id.toString(),
       slack: newProject.slack,
       name: newProject.name,
@@ -90,7 +90,9 @@ export const createProject = async (
       techStack: newProject.techStack,
       workType: newProject.workType,
       tasks: [],
-    });
+    };
+    projectList.push(projectToAdd); // Still update projectList for consistency
+    return projectToAdd; // Return the new project
   } catch (error) {
     console.error("Failed to create a Project", error);
     throw error;
@@ -102,13 +104,13 @@ export const createTask = async (
   projectSlack: string,
   taskData: Omit<Task, "id" | "subtasks">
 ): Promise<void> => {
+  console.log("createTask function called");
   // Finding the project according to the slack
   const project = projectList.find((p) => p.slack === projectSlack);
 
   if (!project) {
     throw new Error("Project Not Found");
   }
-  console.log(taskData);
 
   try {
     const response = await api.post(`/projects/${project.id}/tasks`, {
@@ -243,40 +245,77 @@ export const syncWithBackend = async (): Promise<void> => {
 
 // Custom Hook to use the Project Store
 export const useProjectStore = () => {
-  const { isAuthenticated } = useAuth();
 
-  // State to set the projects
-  const [projects, setProjects] = useState<ProjectListDataType[]>(projectList);
+  const hookId = Math.random().toString(36).substring(2, 15);
+  console.log(`useProjectStore instantiated, hookId: ${hookId}`);
+  // const { isAuthenticated } = useAuth();
+  const [projects, setProjects] = useState<ProjectListDataType[]>([]);
+  const [lastUpdate, setLastUpdate] = useState<number>(0);
+
+  // Function to add a new project and update state
+  const addProject = async (
+    projectData: Omit<ProjectListDataType, "id" | "slack" | "tasks">
+  ) => {
+    try {
+      console.log(`addProject Function Called, hookId: ${hookId}`);
+
+      const newProject = await createProject(projectData); // Get the new project
+      console.log(`New project created, hookId: ${hookId}`, newProject);
+      setProjects((prevProjects) => {
+        
+        const updatedProjects = [...prevProjects, newProject];
+        console.log(`New projects state, hookId: ${hookId}:`, updatedProjects);
+        return updatedProjects;
+      });
+      console.log(`After setProjects, hookId: ${hookId}`);
+      setLastUpdate(Date.now());
+    } catch (error) {
+      console.error("Error adding project:", error);
+      throw error;
+    }
+  };
+
+  // Function to add a new task and update state
+  const addTask = async (
+    projectSlack: string,
+    taskData: Omit<Task, "id" | "subtasks">
+  ) => {
+    try {
+      console.log("addTask function called");
+      await createTask(projectSlack, taskData);
+      console.log("After await createTask"); // Updates projectList
+      setProjects([...projectList]); // Update state to reflect projectList
+    } catch (error) {
+      console.error("Error adding task:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
-    if(!isAuthenticated)
-    {
-      return;
-    }
-    else
-    {
-      // Initial fetch
-      fetchProjects().then((fetchedProjects)=>{
-        setProjects(fetchedProjects);
-      })
+    // Initial fetch
+    fetchProjects().then((fetchedProjects) => {
+      setProjects(fetchedProjects);
+    });
 
-      // Periodic sync every 30 seconds
-
-      syncInterval = setInterval(()=>{
-        syncWithBackend().then(()=>{
-          setProjects([...projectList]);
-        })
-      },30000);
-
-      // Clean Up Interval on unmount
-      return()=>{
-        if(syncInterval)
-        {
-          clearInterval(syncInterval);
-        }
+    // Periodic sync every 30 seconds
+    syncInterval = setInterval(() => {
+      if (Date.now() - lastUpdate < 5000) {
+        console.log("Skipping sync due to recent update");
+        return; // Skip sync if a project was added in the last 5 seconds
       }
-    }
-  },[isAuthenticated]);
-  return projects;
-};
 
+      syncWithBackend().then(() => {
+        setProjects([...projectList]);
+      });
+    }, 30000);
+
+    // Clean up interval on unmount
+    return () => {
+      if (syncInterval) {
+        clearInterval(syncInterval);
+      }
+    };
+  }, []);
+
+  return { projects, addProject, addTask };
+};

@@ -6,7 +6,8 @@ import {
   fetchProjectBySlack,
   addSubtaskToTask,
   updateSubTaskCompletionStatus,
-  useProjectStore,
+  
+  
 } from "@/CONSTANTS/ProjectListItems";
 import { MessageCircle, Paperclip, Plus, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -16,15 +17,16 @@ const taskCategories = ["Todo", "In Progress", "Completed"] as const;
 type TaskCategory = (typeof taskCategories)[number];
 
 export default function ProjectDetailsBody() {
+  
   // State for tracking which task has been clicked
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
   // State or Local data to track which project is opened
-  const [project, setProject] = useState<ProjectListDataType | undefined>(
-    undefined
-  );
+  const [project, setProject] = useState<ProjectListDataType | undefined>(undefined);
 
   // State to track if the Modal to create a Task is open or not
-  const [isCreateTaskModalOpen,setIsCreateProjectModalOpen] = useState<boolean>(false);
+  const [isCreateTaskModalOpen, setIsCreateProjectModalOpen] =
+    useState<boolean>(false);
 
   const { slack } = useParams<{ slack: string }>();
 
@@ -117,9 +119,9 @@ export default function ProjectDetailsBody() {
           <div className="text-xl px-4 font-semibold tracking-widest">
             TASKS
           </div>
-          <button 
-          className="mr-4 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 cursor-pointer"
-          onClick={()=>setIsCreateProjectModalOpen(true)}
+          <button
+            className="mr-4 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 cursor-pointer"
+            onClick={() => setIsCreateProjectModalOpen(true)}
           >
             <Plus size={20} />
           </button>
@@ -221,7 +223,10 @@ export default function ProjectDetailsBody() {
 
       {/* Task Modal Open Close */}
       {isCreateTaskModalOpen && (
-      <CreateTaskModal projectSlack = {slack} onClose={()=>setIsCreateProjectModalOpen(false)}/>
+        <CreateTaskModal
+          projectSlack={slack as string}
+          onClose={() => setIsCreateProjectModalOpen(false)}
+        />
       )}
     </>
   );

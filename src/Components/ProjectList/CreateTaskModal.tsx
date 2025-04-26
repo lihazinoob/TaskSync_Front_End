@@ -1,4 +1,4 @@
-import { Task, createTask } from "@/CONSTANTS/ProjectListItems";
+import { Task, useProjectStore } from "@/CONSTANTS/ProjectListItems";
 import { X } from "lucide-react";
 import { useState } from "react";
 interface CreateTaskModalProps {
@@ -15,6 +15,7 @@ export default function CreateTaskModal({
   // State to track the assignees
   const [assigneeInput, setAssigneeInput] = useState("");
 
+  const { addTask } = useProjectStore();
   // State to track the data from the user
   const [formData, setFormData] = useState<Omit<Task, "id" | "subtasks">>({
     title: "",
@@ -40,7 +41,7 @@ export default function CreateTaskModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createTask(projectSlack, formData);
+      await addTask(projectSlack, formData);
       setError(null);
       onClose();
     } catch (error: any) {
