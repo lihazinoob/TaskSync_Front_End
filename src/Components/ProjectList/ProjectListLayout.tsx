@@ -1,12 +1,18 @@
 import { useState } from "react";
 import SearchBarProjectList from "./SearchBarProjectList";
 import {
-  ProjectListItem,
+  useProjectStore,
   ProjectListDataType,
 } from "@/CONSTANTS/ProjectListItems";
 import { NavLink } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
+
+
 function ProjectListLayout() {
+
+  // Fetching the projects from the ProjectListItem using the custome hook
+  const projects = useProjectStore();
+
   // State to store the selected category
   const [selectedCategory, setSelectedcategory] = useState("Active");
 
@@ -15,15 +21,15 @@ function ProjectListLayout() {
 
   // Group the projects by category
   const groupedProjects: { [key: string]: ProjectListDataType[] } = {
-    Active: ProjectListItem.filter((project) => {
+    Active: projects.filter((project) => {
       return project.category === "Active";
     }),
 
-    OnHold: ProjectListItem.filter((project) => {
+    'On Hold': projects.filter((project) => {
       return project.category === "On Hold";
     }),
 
-    Closed: ProjectListItem.filter((project) => {
+    Closed: projects.filter((project) => {
       return project.category === "Closed";
     }),
   };
@@ -109,7 +115,7 @@ function ProjectListLayout() {
                         </span>
                         <div className="w-1.5 h-1.5 bg-slate-800 rounded-full" />
                         <span className="font-light text-sm text-slate-800">
-                          {project.WorkType}
+                          {project.workType}
                         </span>
                       </div>
                     </div>

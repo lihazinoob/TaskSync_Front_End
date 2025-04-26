@@ -1,8 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState,useEffect } from "react";
 import {
-  ProjectListItem,
-  ProjectListDataType,
+  fetchProjectBySlack
 } from "@/CONSTANTS/ProjectListItems";
 import { Star, Plus } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -10,9 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 export default function ProjectDetailsHeader() {
   const { slack } = useParams<{ slack: string }>();
-  const project = ProjectListItem.find(
-    (p: ProjectListDataType) => p.slack === slack
-  );
+  const project = slack ? fetchProjectBySlack(slack): undefined;
 
   // state for toggling the star icon
   const [isStarred, setIsSStarred] = useState(false);
@@ -73,7 +70,7 @@ export default function ProjectDetailsHeader() {
               {project?.name}
             </div>
             <div className="text-sm tracking-wider">
-              {project?.techStack}/{project?.WorkType}
+              {project?.techStack}/{project?.workType}
             </div>
           </div>
 
