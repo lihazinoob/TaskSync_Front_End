@@ -1,3 +1,5 @@
+import api from "@/Context/axios";
+
 export interface Subtask {
   id: string;
   title: string;
@@ -8,7 +10,7 @@ export interface Subtask {
 export interface Task {
   id: string;
   title: string;
-  category: "Todo" | "In Progress" | "In Review" | "Completed";
+  category: "Todo" | "In Progress" | "Completed";
   description: string;
   createdBy: string;
   assignees: string[];
@@ -22,10 +24,118 @@ export interface ProjectListDataType {
   slack: string;
   name: string;
   category: "Active" | "On Hold" | "Closed";
-  techStack: "Website" | "Android" | "IOS" | "Flutter" | "React Native";
-  WorkType: "UI Design" | "Development" | "All";
+  techStack: string;
+  workType: string;
   tasks: Task[];
 }
+
+// Local store state
+let projectList: ProjectListDataType[] = [];
+let syncInterval: NodeJS.Timeout | null = null;
+
+// Fetch Project from the backend
+export const fetchProjects = async (): Promise<ProjectListDataType[]> => {
+  try {
+    const response = await api.get("/projects");
+    projectList = response.data.data.map((project: any) => ({
+      id: project.id.toString(),
+      slack: project.slack,
+      name: project.name,
+      category: project.category,
+      techStack: project.techStack,
+      workType: project.workType,
+      tasks: project.tasks.map((task: any) => ({
+        id: task.id.toString(),
+        title: task.title,
+        category: task.category,
+        description: task.description || "",
+        createdBy: task.created_by,
+        assignees: task.assignees || [],
+        timeline: task.timeline,
+        status: task.status,
+        subtasks: task.subtasks.map((subtask: any) => ({
+          id: subtask.id.toString(),
+          title: subtask.title,
+          completed: subtask.completed,
+        })),
+      })),
+    }));
+    return projectList;
+  } catch (error) {
+    console.error("Failed to fetch projects:", error);
+    throw error;
+  }
+};
+
+// Create a Project
+export const createProject = async (
+  projectData: Omit<ProjectListDataType, "id" | "slack" | "tasks">
+): Promise<void> => {
+  try {
+    // Sending the data over the backend
+    const response = await api.post("/createProject", {
+      name: projectData.name,
+      category: projectData.category,
+      techStack: projectData.techStack,
+      workType: projectData.workType,
+    });
+
+    const newProject = response.data.data;
+    projectList.push({
+      id: newProject.id.toString(),
+      slack: newProject.slack,
+      name: newProject.name,
+      category: newProject.category,
+      techStack: newProject.techStack,
+      workType: newProject.workType,
+      tasks: [],
+    });
+  } catch (error) {
+    console.error("Failed to create a Project", error);
+    throw error;
+  }
+};
+
+// Create a Task
+export const createTask = async (
+  projectSlack: string,
+  taskData: Omit<Task, "id" | "subtasks">
+): Promise<void> => {
+  // Finding the project according to the slack
+  const project = projectList.find((p) => p.slack === projectSlack);
+
+  if (!project) {
+    throw new Error("Project Not Found");
+  }
+
+  try {
+    const response = await api.post(`/projects/${project.id}/tasks`, {
+      title: taskData.title,
+      category: taskData.category,
+      description: taskData.description,
+      created_by: taskData.createdBy,
+      assignees: taskData.assignees,
+      timeline: taskData.timeline,
+      status: taskData.status,
+    });
+
+    const newTask = response.data.data;
+    project.tasks.push({
+      id: newTask.id.toString(),
+      title: newTask.title,
+      category: newTask.category,
+      description: newTask.description,
+      createdBy: newTask.created_by,
+      assignees: newTask.assignees,
+      timeline: newTask.timeline,
+      status: newTask.status,
+      subtasks: [],
+    });
+  } catch (error) {
+    console.error("Failed to create task:", error);
+    throw error;
+  }
+};
 
 export const ProjectListItem: ProjectListDataType[] = [
   {
@@ -357,7 +467,7 @@ export const ProjectListItem: ProjectListDataType[] = [
       {
         id: "10-1",
         title: "Quiz Module",
-        category: "In Review",
+        category: "In Progress",
         description: "Develop and review quiz feature.",
         createdBy: "Tina Ross",
         assignees: ["Mason Roy"],
@@ -460,45 +570,42 @@ export const addSubtaskToTask = (
 // Function to update a subtask's completion status
 
 export const updateSubTaskCompletionStatus = (
-  projectSlack:string,
-  taskId:string,
-  subTaskId:string,
-  completed:boolean
-):Promise<void> =>{
-  return new Promise((resolve,reject)=>{
-    const projectIndex = ProjectListItem.findIndex((project)=>{
-      return project.slack === projectSlack
+  projectSlack: string,
+  taskId: string,
+  subTaskId: string,
+  completed: boolean
+): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    const projectIndex = ProjectListItem.findIndex((project) => {
+      return project.slack === projectSlack;
     });
     // If there is no related project accroding to the slack,reject it
-    if(projectIndex === -1)
-    {
+    if (projectIndex === -1) {
       reject(new Error("There is no project related to the slack"));
       return;
-    }
-    else
-    {
+    } else {
       const project = ProjectListItem[projectIndex];
-      const taskIndex = project.tasks.findIndex((task)=>{
-        return task.id === taskId
+      const taskIndex = project.tasks.findIndex((task) => {
+        return task.id === taskId;
       });
-      if(taskIndex === -1)
-      {
+      if (taskIndex === -1) {
         reject(new Error("There is no relatd task in the project"));
         return;
-      }
-      else
-      {
-        const subTaskIndex = project.tasks[taskIndex].subtasks.findIndex((sub)=>{
-          return sub.id === subTaskId
-        });
+      } else {
+        const subTaskIndex = project.tasks[taskIndex].subtasks.findIndex(
+          (sub) => {
+            return sub.id === subTaskId;
+          }
+        );
         if (subTaskIndex === -1) {
           reject(new Error("Subtask not found"));
           return;
-        }
-        else{
+        } else {
           // The finding is done, now update
 
-          ProjectListItem[projectIndex].tasks[taskIndex].subtasks[subTaskIndex].completed = completed;
+          ProjectListItem[projectIndex].tasks[taskIndex].subtasks[
+            subTaskIndex
+          ].completed = completed;
 
           setTimeout(() => {
             console.log(
@@ -509,7 +616,5 @@ export const updateSubTaskCompletionStatus = (
         }
       }
     }
-
-
   });
-}
+};

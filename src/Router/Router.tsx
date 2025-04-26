@@ -8,7 +8,6 @@ import MessagePage from "@/Pages/MessagePage/MessagePage";
 import NotificationPage from "@/Pages/NotificationPage/NotificationPage";
 import ProjectDetailsLayout from "@/Components/ProjectList/ProjectDetailsLayout";
 import AuthWrapper from "@/Components/Auth/AuthWrapper";
-import AuthCallBack from "@/Components/Auth/AuthCallBack";
 import DefaultLayout from "@/Layout/DefaultLayout/DefaultLayout";
 import ProtectedRoute from "@/Layout/ProtectedLayout/ProtectedLayout";
 
@@ -20,10 +19,6 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <AuthWrapper />,
-      },
-      {
-        path: "/auth/callback",
-        element: <AuthCallBack />,
       },
       // // This path or route is for SignUp layout
       {

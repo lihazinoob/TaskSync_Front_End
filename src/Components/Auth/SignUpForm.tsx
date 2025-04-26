@@ -1,5 +1,4 @@
 import api from "@/Context/axios";
-import GitHubIcon from "../../assets/GitHubIcon.svg";
 import { useRef, useState} from "react";
 import { useAuth } from "@/Context/AuthContext";
 import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
@@ -63,25 +62,7 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
     return Object.keys(newErrors).length === 0;
   }
 
-  async function handleGitHubAuth() {
-    try {
-      setLoading(true);
-      const { data } = await api.get("/auth/github", {
-        params: {
-          redirect: `${window.location.origin}/auth/callback`,
-          state: "signup",
-        },
-      });
-      console.log("Redirecting to GitHub:", data.url);
-      window.location.href = data.url;
-    } catch (error: any) {
-      console.error("GitHub Auth Error:", error);
-      setErrors({
-        email: "Failed to initiate GitHub Authentication",
-      });
-      setLoading(false);
-    }
-  }
+  
 
   
 
@@ -198,14 +179,7 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
 
         {/* Google Icon */}
 
-        <div className="flex flex-row items-center justify-center">
-          <div
-            className="border-2 border-slate-200 px-4 py-1 rounded-lg cursor-pointer"
-            onClick={handleGitHubAuth}
-          >
-            <img src={GitHubIcon} alt="icon-google" className="w-10 h-10" />
-          </div>
-        </div>
+        
       </div>
     </>
   );

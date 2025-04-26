@@ -37,6 +37,7 @@ const SideBar = ({ isMobile = false }: SideBarProps) => {
         {SideBarLinks.map((menuItem, index) => (
           <IconToopTipWrapper key={index} label={menuItem.label}>
             <NavLink to={menuItem.path}
+            end={menuItem.path === "/dashboard"}
             className={({isActive}) => 
             `flex items-center justify-center rounded-4xl p-2 transition-colors
             ${isActive ? 'bg-black border text-white':'hover:bg-gray-200'}
