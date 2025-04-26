@@ -5,11 +5,10 @@ import {
   ProjectListDataType,
 } from "@/CONSTANTS/ProjectListItems";
 import { NavLink } from "react-router-dom";
-import { ChevronRight } from "lucide-react";
-
+import { ChevronRight, Plus } from "lucide-react";
+import CreateProjectModal from "./CreateProjectModal";
 
 function ProjectListLayout() {
-
   // Fetching the projects from the ProjectListItem using the custome hook
   const projects = useProjectStore();
 
@@ -19,13 +18,17 @@ function ProjectListLayout() {
   // State for the search query
   const [searchQuery, setSearchQuery] = useState("");
 
+  // State for tracking if the CreateProjectModal is Open or not
+  const [isCreateProjectModalOpen, setIsCreateProjectModalOpen] =
+    useState(false);
+
   // Group the projects by category
   const groupedProjects: { [key: string]: ProjectListDataType[] } = {
     Active: projects.filter((project) => {
       return project.category === "Active";
     }),
 
-    'On Hold': projects.filter((project) => {
+    "On Hold": projects.filter((project) => {
       return project.category === "On Hold";
     }),
 
@@ -38,27 +41,32 @@ function ProjectListLayout() {
   const categoryProjects = groupedProjects[selectedCategory] || [];
 
   // Filter projects based on search query
-  const displayedProjects = categoryProjects.filter((project)=>
+  const displayedProjects = categoryProjects.filter((project) =>
     project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-
   // Function for the searching
-  const handleSearch = (query:string) =>
-  {
+  const handleSearch = (query: string) => {
     setSearchQuery(query);
-  }
+  };
 
   return (
     <>
-      
       <div className="h-full px-6 ">
         {/* Project List Header */}
-        <div className="text-2xl font-bold ">All Projects</div>
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-bold ">All Projects</div>
+          <button
+            onClick={() => setIsCreateProjectModalOpen(true)}
+            className="ml-2 w-7 h-7 rounded-full border-2 border-dashed border-slate-700 flex items-center justify-center cursor-pointer"
+          >
+            <Plus size={20} />
+          </button>
+        </div>
 
         {/* Search Bar */}
         <div className="bg-indigo-100 h-10 w-full mt-8 rounded-4xl flex flex-row items-center gap-4">
-          <SearchBarProjectList onSearch = {handleSearch} />
+          <SearchBarProjectList onSearch={handleSearch} />
         </div>
 
         {/* Category Tabs */}
@@ -86,9 +94,7 @@ function ProjectListLayout() {
         <div className="mt-8">
           {displayedProjects.length === 0 ? (
             <div>
-              <p className="text-gray-600">
-                There are no projects.
-              </p>
+              <p className="text-gray-600">There are no projects.</p>
               <p className="text-gray-600">Create one to get started!</p>
             </div>
           ) : (
@@ -121,7 +127,7 @@ function ProjectListLayout() {
                     </div>
                     {/* Arrow Icon */}
                     <div className="flex items-center">
-                      <ChevronRight/>
+                      <ChevronRight />
                     </div>
                   </NavLink>
                 </li>
@@ -130,6 +136,9 @@ function ProjectListLayout() {
           )}
         </div>
       </div>
+      {isCreateProjectModalOpen && <CreateProjectModal 
+      onClose={()=>setIsCreateProjectModalOpen(false)}/>}
+
     </>
   );
 }

@@ -5,7 +5,8 @@ import {
   Task,
   fetchProjectBySlack,
   addSubtaskToTask,
-  updateSubTaskCompletionStatus
+  updateSubTaskCompletionStatus,
+  useProjectStore
 } from "@/CONSTANTS/ProjectListItems";
 import { MessageCircle, Paperclip, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -143,7 +144,7 @@ export default function ProjectDetailsBody() {
                   >
                     {/* Task Type */}
                     <span className="text-xs font-medium text-gray-500">
-                      {project.WorkType.toUpperCase()}
+                      {project.workType.toUpperCase()}
                     </span>
                     {/* Task Title */}
                     <h4 className="text-sm font-semibold text-gray-800 mt-1">
