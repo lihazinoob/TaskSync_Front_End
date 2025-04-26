@@ -108,6 +108,7 @@ export const createTask = async (
   if (!project) {
     throw new Error("Project Not Found");
   }
+  console.log(taskData);
 
   try {
     const response = await api.post(`/projects/${project.id}/tasks`, {

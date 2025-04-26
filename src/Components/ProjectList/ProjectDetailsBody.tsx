@@ -6,11 +6,12 @@ import {
   fetchProjectBySlack,
   addSubtaskToTask,
   updateSubTaskCompletionStatus,
-  useProjectStore
+  useProjectStore,
 } from "@/CONSTANTS/ProjectListItems";
-import { MessageCircle, Paperclip, UserCircle } from "lucide-react";
+import { MessageCircle, Paperclip, Plus, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import TaskDetailsSideBar from "./TaskDetailsSideBar";
+import CreateTaskModal from "./CreateTaskModal";
 const taskCategories = ["Todo", "In Progress", "Completed"] as const;
 type TaskCategory = (typeof taskCategories)[number];
 
@@ -18,50 +19,53 @@ export default function ProjectDetailsBody() {
   // State for tracking which task has been clicked
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   // State or Local data to track which project is opened
-  const[project,setProject] = useState<ProjectListDataType|undefined>(undefined);
+  const [project, setProject] = useState<ProjectListDataType | undefined>(
+    undefined
+  );
+
+  // State to track if the Modal to create a Task is open or not
+  const [isCreateTaskModalOpen,setIsCreateProjectModalOpen] = useState<boolean>(false);
 
   const { slack } = useParams<{ slack: string }>();
-  
+
   // when the component mounts or the slack changes the function fetchProjectBySlack is called
-  useEffect(()=>{
-    if(slack)
-    {
+  useEffect(() => {
+    if (slack) {
       setProject(fetchProjectBySlack(slack));
     }
-  },[slack]);
+  }, [slack]);
 
   // function to habdle subtask addition which is passed to the SubTaskInSideBar
-  async function handleAddSubTask(taskId:string,newSubTask:Subtask)
-  {
-    if(!slack)
-    {
+  async function handleAddSubTask(taskId: string, newSubTask: Subtask) {
+    if (!slack) {
       console.error("Slack Parametr is undefined");
       return;
     }
-    try{
-      await addSubtaskToTask(slack, taskId,newSubTask);
+    try {
+      await addSubtaskToTask(slack, taskId, newSubTask);
       // refetch the project to update the UI
       const updatedProject = fetchProjectBySlack(slack);
       setProject(updatedProject);
 
-      // Update the selected task 
-      if(selectedTask && selectedTask.id === taskId)
-      {
-        const updatedTask = updatedProject?.tasks.find((task)=> task.id === taskId);
-        if(updatedTask)
-        {
+      // Update the selected task
+      if (selectedTask && selectedTask.id === taskId) {
+        const updatedTask = updatedProject?.tasks.find(
+          (task) => task.id === taskId
+        );
+        if (updatedTask) {
           setSelectedTask(updatedTask);
         }
       }
-
-    }
-    catch(err)
-    {
-      console.error("Failed to add subtask",err);
+    } catch (err) {
+      console.error("Failed to add subtask", err);
     }
   }
 
-  async function handleToggleSubtask(taskId: string, subtaskId: string, completed: boolean) {
+  async function handleToggleSubtask(
+    taskId: string,
+    subtaskId: string,
+    completed: boolean
+  ) {
     if (!slack) {
       console.error("Slack parameter is undefined");
       return;
@@ -73,7 +77,9 @@ export default function ProjectDetailsBody() {
       setProject(updatedProject);
 
       if (selectedTask && selectedTask.id === taskId) {
-        const updatedTask = updatedProject?.tasks.find((task) => task.id === taskId);
+        const updatedTask = updatedProject?.tasks.find(
+          (task) => task.id === taskId
+        );
         if (updatedTask) {
           setSelectedTask(updatedTask);
         }
@@ -107,7 +113,17 @@ export default function ProjectDetailsBody() {
     <>
       <div className="bg-indigo-100 p-2 rounded-lg">
         {/* Header section */}
-        <div className="text-xl px-4 font-semibold tracking-widest">TASKS</div>
+        <div className="flex justify-between items-center mt-2">
+          <div className="text-xl px-4 font-semibold tracking-widest">
+            TASKS
+          </div>
+          <button 
+          className="mr-4 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 cursor-pointer"
+          onClick={()=>setIsCreateProjectModalOpen(true)}
+          >
+            <Plus size={20} />
+          </button>
+        </div>
 
         {/* Different Tasks of different category */}
         <div className="mt-8 px-2 flex space-x-4">
@@ -198,9 +214,14 @@ export default function ProjectDetailsBody() {
             task={selectedTask}
             onClose={() => setSelectedTask(null)}
             onAddSubTask={handleAddSubTask}
-            onToggleSubtask = {handleToggleSubtask}
+            onToggleSubtask={handleToggleSubtask}
           />
         </>
+      )}
+
+      {/* Task Modal Open Close */}
+      {isCreateTaskModalOpen && (
+      <CreateTaskModal projectSlack = {slack} onClose={()=>setIsCreateProjectModalOpen(false)}/>
       )}
     </>
   );
