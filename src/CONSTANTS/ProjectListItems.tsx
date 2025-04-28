@@ -148,28 +148,28 @@ export const addSubtaskToTask = async (
   projectSlack: string,
   taskId: string,
   newSubtask: Subtask
-): Promise<void> => {
-  const projectIndex = projectList.findIndex((p) => p.slack === projectSlack);
-  if (projectIndex === -1) {
+): Promise<Subtask> => {
+  // Finding the cuurentProject by slack
+  const currentProject = projectList.find((p) => p.slack === projectSlack);
+  if (!currentProject) {
     throw new Error("Project Not Found");
   }
-  const project = projectList[projectIndex];
-  const taskIndex = project.tasks.findIndex((t) => t.id === taskId);
-  if (taskIndex === -1) {
-    throw new Error("Task not Found");
+  // Finding the task of the subtask by using taskId
+  const task = currentProject.tasks.find((task) => task.id === taskId);
+  if (!task) {
+    throw new Error("Task Not Found");
   }
-
   try {
     const response = await api.post(`/tasks/${taskId}/subtasks`, {
       title: newSubtask.title,
     });
-
-    const createdSubTask = response.data.data;
-    projectList[projectIndex].tasks[taskIndex].subtasks.push({
-      id: createdSubTask.id.toString(),
-      title: createdSubTask.title,
-      completed: createdSubTask.completed,
-    });
+    const createdSubTask: Subtask = {
+      id: response.data.data.id.toString(),
+      title: response.data.data.title,
+      completed: response.data.data.completed,
+    };
+    task.subtasks.push(createdSubTask);
+    return createdSubTask;
   } catch (error) {
     console.error("Failed to add SubTask", error);
     throw error;
@@ -189,10 +189,16 @@ export const updateSubTaskCompletionStatus = async (
   subTaskId: string,
   completed: boolean
 ): Promise<void> => {
-  const projectIndex = projectList.findIndex((p) => p.slack === projectSlack);
-  if (projectIndex === -1) throw new Error("Project not found");
+  // finding the project and task in which the subtask resides in
+  const project = projectList.find((p) => p.slack === projectSlack);
+  if (!project) {
+    throw new Error("Project not found");
+  }
+  const task = project.tasks.find((t) => t.id === taskId);
+  if (!task) {
+    throw new Error("Task not found");
+  }
 
-  const project = projectList[projectIndex];
   const taskIndex = project.tasks.findIndex((t) => t.id === taskId);
   if (taskIndex === -1) throw new Error("Task not found");
 
@@ -203,9 +209,13 @@ export const updateSubTaskCompletionStatus = async (
 
   try {
     await api.patch(`/subtasks/${subTaskId}`, { completed });
-    projectList[projectIndex].tasks[taskIndex].subtasks[
-      subTaskIndex
-    ].completed = completed;
+
+    // Finding the subtask
+    const subtask = task.subtasks.find((s) => s.id === subTaskId);
+
+    if (subtask) {
+      subtask.completed = completed;
+    }
   } catch (error) {
     console.error("Failed to update subtask:", error);
     throw error;
@@ -247,9 +257,6 @@ export const syncWithBackend = async (): Promise<void> => {
 
 // Custom Hook to use the Project Store
 export const useProjectStore = () => {
-
-  const hookId = Math.random().toString(36).substring(2, 15);
-  console.log(`useProjectStore instantiated, hookId: ${hookId}`);
   // const { isAuthenticated } = useAuth();
   const [projects, setProjects] = useState<ProjectListDataType[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(0);
@@ -259,17 +266,11 @@ export const useProjectStore = () => {
     projectData: Omit<ProjectListDataType, "id" | "slack" | "tasks">
   ) => {
     try {
-      console.log(`addProject Function Called, hookId: ${hookId}`);
-
       const newProject = await createProject(projectData); // Get the new project
-      console.log(`New project created, hookId: ${hookId}`, newProject);
       setProjects((prevProjects) => {
-        
         const updatedProjects = [...prevProjects, newProject];
-        console.log(`New projects state, hookId: ${hookId}:`, updatedProjects);
         return updatedProjects;
       });
-      console.log(`After setProjects, hookId: ${hookId}`);
       setLastUpdate(Date.now());
     } catch (error) {
       console.error("Error adding project:", error);
@@ -302,6 +303,83 @@ export const useProjectStore = () => {
     }
   };
 
+  // Wrapper Function to handle the SubTask Addition
+  const addSubTask = async (
+    projectSlack: string,
+    taskId: string,
+    newSubtask: Subtask
+  ) => {
+    try {
+      const createdSubtask = await addSubtaskToTask(
+        projectSlack,
+        taskId,
+        newSubtask
+      );
+
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.slack === projectSlack
+            ? {
+                ...project,
+                tasks: project.tasks.map((task) =>
+                  task.id === taskId
+                    ? { ...task, subtasks: [...task.subtasks, createdSubtask] }
+                    : task
+                ),
+              }
+            : project
+        )
+      );
+      setLastUpdate(Date.now());
+    } catch (error) {
+      console.error("Error adding subtask:", error);
+      throw error;
+    }
+  };
+
+  // Wrapper Function to toggle the completion status
+  const toggleSubTaskCompletionStatus = async (
+    projectSlack: string,
+    taskId: string,
+    subTaskId: string,
+    completed: boolean
+  ) => {
+    try {
+      await updateSubTaskCompletionStatus(
+        projectSlack,
+        taskId,
+        subTaskId,
+        completed
+      );
+      setProjects((prevProjects) =>
+        prevProjects.map((project) =>
+          project.slack === projectSlack
+            ? {
+                ...project,
+                tasks: project.tasks.map((task) =>
+                  task.id === taskId
+                    ? {
+                        ...task,
+                        subtasks: task.subtasks.map((subtask) =>
+                          subtask.id === subTaskId
+                            ? { ...subtask, completed }
+                            : subtask
+                        ),
+                      }
+                    : task
+                ),
+              }
+            : project
+        )
+      );
+
+      setLastUpdate(Date.now());
+    } catch (error) {
+      console.error("Error toggling subtask:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     // Initial fetch
     fetchProjects().then((fetchedProjects) => {
@@ -328,5 +406,5 @@ export const useProjectStore = () => {
     };
   }, []);
 
-  return { projects, addProject, addTask };
+  return { projects, addProject, addTask, addSubTask,toggleSubTaskCompletionStatus };
 };
