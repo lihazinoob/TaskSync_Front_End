@@ -6,6 +6,7 @@ import {
   fetchProjectBySlack,
   addSubtaskToTask,
   updateSubTaskCompletionStatus,
+  useProjectStore,
   
   
 } from "@/CONSTANTS/ProjectListItems";
@@ -13,29 +14,29 @@ import { MessageCircle, Paperclip, Plus, UserCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import TaskDetailsSideBar from "./TaskDetailsSideBar";
 import CreateTaskModal from "./CreateTaskModal";
+import { useProjectStoreContext } from "@/Context/ProjectStoreContext";
 const taskCategories = ["Todo", "In Progress", "Completed"] as const;
 type TaskCategory = (typeof taskCategories)[number];
 
 export default function ProjectDetailsBody() {
-  
+
+  // Finding the slack from the URL of browser
+  const { slack } = useParams<{ slack: string }>();
+
+  // Using the context to get the projects
+  const {projects} = useProjectStoreContext();
+
   // State for tracking which task has been clicked
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-
-  // State or Local data to track which project is opened
-  const [project, setProject] = useState<ProjectListDataType | undefined>(undefined);
 
   // State to track if the Modal to create a Task is open or not
   const [isCreateTaskModalOpen, setIsCreateProjectModalOpen] =
     useState<boolean>(false);
 
-  const { slack } = useParams<{ slack: string }>();
 
-  // when the component mounts or the slack changes the function fetchProjectBySlack is called
-  useEffect(() => {
-    if (slack) {
-      setProject(fetchProjectBySlack(slack));
-    }
-  }, [slack]);
+  const project = projects.find((p)=>p.slack === slack);
+
+
 
   // function to habdle subtask addition which is passed to the SubTaskInSideBar
   async function handleAddSubTask(taskId: string, newSubTask: Subtask) {
@@ -47,7 +48,7 @@ export default function ProjectDetailsBody() {
       await addSubtaskToTask(slack, taskId, newSubTask);
       // refetch the project to update the UI
       const updatedProject = fetchProjectBySlack(slack);
-      setProject(updatedProject);
+      // setProject(updatedProject);
 
       // Update the selected task
       if (selectedTask && selectedTask.id === taskId) {
@@ -76,7 +77,7 @@ export default function ProjectDetailsBody() {
     try {
       await updateSubTaskCompletionStatus(slack, taskId, subtaskId, completed);
       const updatedProject = fetchProjectBySlack(slack);
-      setProject(updatedProject);
+      // setProject(updatedProject);
 
       if (selectedTask && selectedTask.id === taskId) {
         const updatedTask = updatedProject?.tasks.find(

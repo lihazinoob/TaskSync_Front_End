@@ -1,4 +1,5 @@
 import { Task, useProjectStore } from "@/CONSTANTS/ProjectListItems";
+import { useProjectStoreContext } from "@/Context/ProjectStoreContext";
 import { X } from "lucide-react";
 import { useState } from "react";
 interface CreateTaskModalProps {
@@ -15,7 +16,7 @@ export default function CreateTaskModal({
   // State to track the assignees
   const [assigneeInput, setAssigneeInput] = useState("");
 
-  const { addTask } = useProjectStore();
+  const { addTask } = useProjectStoreContext();
   // State to track the data from the user
   const [formData, setFormData] = useState<Omit<Task, "id" | "subtasks">>({
     title: "",

@@ -103,7 +103,7 @@ export const createProject = async (
 export const createTask = async (
   projectSlack: string,
   taskData: Omit<Task, "id" | "subtasks">
-): Promise<void> => {
+): Promise<Task> => {
   console.log("createTask function called");
   // Finding the project according to the slack
   const project = projectList.find((p) => p.slack === projectSlack);
@@ -124,7 +124,7 @@ export const createTask = async (
     });
 
     const newTask = response.data.data;
-    project.tasks.push({
+    const taskToAdd: Task = {
       id: newTask.id.toString(),
       title: newTask.title,
       category: newTask.category,
@@ -134,7 +134,9 @@ export const createTask = async (
       timeline: newTask.timeline,
       status: newTask.status,
       subtasks: [],
-    });
+    };
+    project.tasks.push(taskToAdd);
+    return taskToAdd;
   } catch (error) {
     console.error("Failed to create task:", error);
     throw error;
@@ -282,9 +284,18 @@ export const useProjectStore = () => {
   ) => {
     try {
       console.log("addTask function called");
-      await createTask(projectSlack, taskData);
+      const newTask = await createTask(projectSlack, taskData);
+      setProjects((prevProjects) => {
+        const updatedProjects = prevProjects.map((project) =>
+          project.slack === projectSlack
+            ? { ...project, tasks: [...project.tasks, newTask] }
+            : project
+        );
+        console.log("Updated projects with new task:", updatedProjects);
+        return updatedProjects;
+      });
       console.log("After await createTask"); // Updates projectList
-      setProjects([...projectList]); // Update state to reflect projectList
+      setLastUpdate(Date.now());
     } catch (error) {
       console.error("Error adding task:", error);
       throw error;

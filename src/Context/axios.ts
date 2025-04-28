@@ -34,6 +34,7 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // console.log("Axios error:", error.response?.status, error.config?.url);
     const originalRequest = error.config;
     if (
       error.response?.status === 401 &&
@@ -49,7 +50,7 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // If refresh fails, redirect to login
         accessToken = null;
-        window.location.href = "/login";
+        window.location.href = "/";
         return Promise.reject(refreshError);
       }
     }
