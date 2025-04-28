@@ -1,129 +1,94 @@
-import { Task, Subtask } from "@/CONSTANTS/ProjectListItems";
-import { CheckSquare, Square,BadgePlus } from "lucide-react";
-import { useEffect, useState } from "react";
+// SubTaskinSideBar.tsx
+import { Subtask } from "@/CONSTANTS/ProjectListItems";
+import { BadgePlus } from "lucide-react";
+import { useState } from "react";
 import AddSubTaskModal from "./AddSubTaskModal";
+
 interface SubTaskinSideBarProps {
-  task: Task;
-  taskId:string;
-  onAddSubTask:(taskId:string,newSubTask:Subtask)=> Promise<void>;
+  taskId: string;
+  subtasks: Subtask[];
+  onAddSubTask: (taskId: string, newSubTask: Subtask) => Promise<void>;
   onToggleSubtask: (taskId: string, subtaskId: string, completed: boolean) => Promise<void>;
 }
 
-export default function SubTaskinSideBar({ task,taskId,onAddSubTask,onToggleSubtask}: SubTaskinSideBarProps) {
-  // State to track which Subtasks are completed and which are not
-  const [completedSubTask, setCompletedSubTask] = useState<Subtask[]>([]);
+export default function SubTaskinSideBar({
+  taskId,
+  subtasks,
+  onAddSubTask,
+  onToggleSubtask,
+}: SubTaskinSideBarProps) {
+  const [isAddSubTaskModalOpen, setIsAddSubTaskModalOpen] = useState(false);
+  const [localSubtasks, setLocalSubtasks] = useState<Subtask[]>(subtasks);
 
-  // State to track if the modal for the Sub task add is oprn or not
-  const[isModalOpen,setIsModalOpen] = useState<boolean>(false);
-
-  // useEffect hook to initialize completes subtask state when completed
-  useEffect(() => {
-    if (
-      completedSubTask.length === 0 ||
-      !completedSubTask.every(
-        (subtask, index) => subtask.id === task.subtasks[index]?.id
-      )
-    ) {
-      setCompletedSubTask(task.subtasks);
-    }
-  }, [task]);
-
-  async function toggleSubTaskCompletion(subTaskId: string) {
-    const subtask = completedSubTask.find((s) => s.id === subTaskId);
+  const handleToggle = async (subtaskId: string, completed: boolean) => {
+    const subtask = localSubtasks.find((s) => s.id === subtaskId);
     if (!subtask) return;
 
-    const newCompletedStatus = !subtask.completed;
-
-    // Optimistically update the local state
-    setCompletedSubTask((prevCompletedTask) =>
-      prevCompletedTask.map((subtask) =>
-        subtask.id === subTaskId
-          ? { ...subtask, completed: newCompletedStatus }
-          : subtask
-      )
+    const previousCompleted = subtask.completed;
+    setLocalSubtasks((prev) =>
+      prev.map((s) => (s.id === subtaskId ? { ...s, completed } : s))
     );
 
-    // Persist the change
     try {
-      await onToggleSubtask(taskId, subTaskId, newCompletedStatus);
+      await onToggleSubtask(taskId, subtaskId, completed);
     } catch (error) {
       console.error("Failed to toggle subtask:", error);
-      // Revert the local state if the API call fails
-      setCompletedSubTask((prevCompletedTask) =>
-        prevCompletedTask.map((subtask) =>
-          subtask.id === subTaskId
-            ? { ...subtask, completed: !newCompletedStatus }
-            : subtask
+      setLocalSubtasks((prev) =>
+        prev.map((s) =>
+          s.id === subtaskId ? { ...s, completed: previousCompleted } : s
         )
       );
     }
-  }
+  };
 
-  // Handler function to add a new Subtask
-  async function handleAddSubTask(newSubTask:Subtask)
-  {
-    try{
-      await onAddSubTask(taskId,newSubTask);
-      // Update the local state tom reflect the change immidiately,not needed now, because it is too fast
-      // setCompletedSubTask((prev)=>[...prev,newSubTask]);
-    }
-    catch(error){
-      console.error("Failed to add subtask",error);
-    }
-  }
-
-  if (completedSubTask.length === 0) {
-    return (
-      <>
-        <h3 className="text-sm font-medium text-gray-700">Sub-Tasks:</h3>
-        <div className="text-sm font-medium text-gray-600">
-          There is no subtask
-        </div>
-      </>
-    );
-  }
   return (
-    <>
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-medium text-slate-900">Sub-Tasks:</h3>
-        <BadgePlus 
-        size={22} 
-        className="text-emerald-700 cursor-pointer"
-        onClick={()=>setIsModalOpen(true)}
-        />
+    <div className="mt-4">
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-sm font-semibold">Subtasks</h3>
+        <button
+          onClick={() => setIsAddSubTaskModalOpen(true)}
+          className="text-indigo-500 hover:text-indigo-700"
+        >
+          <BadgePlus size={20} />
+        </button>
       </div>
-
-      <ul className="mt-4 space-y-2">
-        {completedSubTask.map((subtask) => (
-          <li
-            key={subtask.id}
-            className="flex items-center gap-2 cursor-pointer"
-            onClick={() => toggleSubTaskCompletion(subtask.id)}
-          >
-            {subtask.completed ? (
-              <CheckSquare size={16} className="text-pink-500" />
-            ) : (
-              <Square size={16} className="text-gray-400" />
-            )}
-            <span
-              className={`text-sm ${
-                subtask.completed
-                  ? "text-gray-500 line-through"
-                  : "text-gray-600"
-              }`}
+      {subtasks.length === 0 ? (
+        <p className="text-sm text-gray-500">No subtasks yet.</p>
+      ) : (
+        <ul className="space-y-2">
+          {subtasks.map((subtask) => (
+            <li
+              key={subtask.id}
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => handleToggle(subtask.id, !subtask.completed)}
             >
-              {subtask.title}
-            </span>
-          </li>
-        ))}
-      </ul>
-      {/* the add subtask modal */}
-      {isModalOpen && (
-        <AddSubTaskModal onClose={()=>setIsModalOpen(false)}
-          onAddSubtask={handleAddSubTask}
+              <input
+                type="checkbox"
+                checked={subtask.completed}
+                onChange={() => handleToggle(subtask.id, !subtask.completed)}
+                className="h-4 w-4 text-indigo-600"
+              />
+              <span
+                className={`text-sm ${
+                  subtask.completed ? "line-through text-gray-500" : "text-gray-800"
+                }`}
+              >
+                {subtask.title}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {isAddSubTaskModalOpen && (
+        <AddSubTaskModal
+          onClose={() => setIsAddSubTaskModalOpen(false)}
+          onAddSubtask={async (newSubTask) => {
+            console.log("SubTaskinSideBar: Adding subtask for taskId:", taskId, newSubTask);
+            await onAddSubTask(taskId, newSubTask);
+            setIsAddSubTaskModalOpen(false);
+          }}
         />
       )}
-
-    </>
+    </div>
   );
 }

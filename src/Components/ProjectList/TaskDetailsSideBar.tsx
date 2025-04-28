@@ -1,18 +1,22 @@
 import { Subtask, Task } from "@/CONSTANTS/ProjectListItems";
-import { X} from "lucide-react";
+import { X } from "lucide-react";
 import SubTaskinSideBar from "./SubTaskinSideBar";
 interface TaskDetailsSideBarProps {
   task: Task | null;
   onClose: () => void;
-  onAddSubTask:(taskId:string,newSubtask:Subtask)=>Promise<void>;
-  onToggleSubtask: (taskId: string, subtaskId: string, completed: boolean) => Promise<void>;
+  onAddSubTask: (taskId: string, newSubtask: Subtask) => Promise<void>;
+  onToggleSubtask: (
+    taskId: string,
+    subtaskId: string,
+    completed: boolean
+  ) => Promise<void>;
 }
 
 export default function TaskDetailsSideBar({
   task,
   onClose,
   onAddSubTask,
-  onToggleSubtask
+  onToggleSubtask,
 }: TaskDetailsSideBarProps) {
   if (!task) {
     return null;
@@ -104,13 +108,23 @@ export default function TaskDetailsSideBar({
 
           {/* Subtasks */}
           <div>
-            <SubTaskinSideBar task={task} onAddSubTask={onAddSubTask} taskId={task.id}
-            onToggleSubtask = {onToggleSubtask}
+            <SubTaskinSideBar
+              taskId={task.id}
+              subtasks={task.subtasks}
+              onAddSubTask={async (taskId,newSubTask) => {
+                
+                await onAddSubTask(task.id, newSubTask);
+                console.log(
+                  "TaskDetailsSideBar: Adding subtask for taskId:",
+                  taskId,
+                  newSubTask
+                );
+              }}
+              onToggleSubtask={(taskId,subtaskId, completed) =>
+                onToggleSubtask(taskId, subtaskId, completed)
+              }
             />
           </div>
-
-
-
         </div>
       </div>
     </>

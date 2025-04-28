@@ -160,6 +160,13 @@ export const addSubtaskToTask = async (
     throw new Error("Task Not Found");
   }
   try {
+
+
+    const requestBody = {
+      title: newSubtask.title,
+      completed: newSubtask.completed,
+    };
+    console.log("addSubtaskToTask: Sending request to:", `/tasks/${taskId}/subtasks`, requestBody);
     const response = await api.post(`/tasks/${taskId}/subtasks`, {
       title: newSubtask.title,
     });
