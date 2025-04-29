@@ -18,26 +18,13 @@ export default function SubTaskinSideBar({
   onToggleSubtask,
 }: SubTaskinSideBarProps) {
   const [isAddSubTaskModalOpen, setIsAddSubTaskModalOpen] = useState(false);
-  const [localSubtasks, setLocalSubtasks] = useState<Subtask[]>(subtasks);
+  
 
   const handleToggle = async (subtaskId: string, completed: boolean) => {
-    const subtask = localSubtasks.find((s) => s.id === subtaskId);
-    if (!subtask) return;
-
-    const previousCompleted = subtask.completed;
-    setLocalSubtasks((prev) =>
-      prev.map((s) => (s.id === subtaskId ? { ...s, completed } : s))
-    );
-
     try {
       await onToggleSubtask(taskId, subtaskId, completed);
     } catch (error) {
       console.error("Failed to toggle subtask:", error);
-      setLocalSubtasks((prev) =>
-        prev.map((s) =>
-          s.id === subtaskId ? { ...s, completed: previousCompleted } : s
-        )
-      );
     }
   };
 

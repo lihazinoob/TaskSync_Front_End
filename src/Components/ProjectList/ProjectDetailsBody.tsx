@@ -43,8 +43,8 @@ export default function ProjectDetailsBody() {
         const updatedTask = updatedProject?.tasks.find(
           (task) => task.id === taskId
         );
-        if (updatedTask) {
-          setSelectedTask(updatedTask);
+        if (updatedTask && selectedTask && selectedTask.id === taskId) {
+          setSelectedTask({ ...updatedTask }); // Create a new object to trigger re-render
         }
       }
     } catch (err) {
@@ -70,8 +70,8 @@ export default function ProjectDetailsBody() {
         const updatedTask = updatedProject?.tasks.find(
           (task) => task.id === taskId
         );
-        if (updatedTask) {
-          setSelectedTask(updatedTask);
+        if (updatedTask && selectedTask && selectedTask.id === taskId) {
+          setSelectedTask({ ...updatedTask });
         }
       }
     } catch (err) {
