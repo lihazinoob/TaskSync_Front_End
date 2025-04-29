@@ -21,6 +21,7 @@ let accessToken:string|null = null;
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+    console.log("AccessToken from axios.ts file",accessToken);
     if (accessToken && config.url !== '/refresh') {
       config.headers = config.headers || {};
       config.headers.set('Authorization', `Bearer ${accessToken}`); // Use set() for AxiosHeaders

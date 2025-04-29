@@ -3,17 +3,14 @@ import { SideBarLinks } from "@/CONSTANTS/SideBarMenuLinks";
 import { NavLink } from "react-router-dom";
 import IconToopTipWrapper from "./IconToolTipWrapper";
 import { Search } from "lucide-react";
+import { useAuth } from "@/Context/AuthContext";
 
 interface SideBarProps {
   isMobile: boolean;
 }
 
 const SideBar = ({ isMobile = false }: SideBarProps) => {
-  // Mock user data (replace with actual user data from context/auth)
-  const user = {
-    profileImage: "https://example.com/user-profile.jpg", // Replace with actual URL
-    name: "Naveed",
-  };
+  const { user } = useAuth();
 
   return (
     <div
@@ -36,13 +33,14 @@ const SideBar = ({ isMobile = false }: SideBarProps) => {
       >
         {SideBarLinks.map((menuItem, index) => (
           <IconToopTipWrapper key={index} label={menuItem.label}>
-            <NavLink to={menuItem.path}
-            end={menuItem.path === "/dashboard"}
-            className={({isActive}) => 
-            `flex items-center justify-center rounded-4xl p-2 transition-colors
-            ${isActive ? 'bg-black border text-white':'hover:bg-gray-200'}
+            <NavLink
+              to={menuItem.path}
+              end={menuItem.path === "/dashboard"}
+              className={({ isActive }) =>
+                `flex items-center justify-center rounded-4xl p-2 transition-colors
+            ${isActive ? "bg-black border text-white" : "hover:bg-gray-200"}
             `
-          }
+              }
             >
               <menuItem.icon className={isMobile ? "w-5 h-5" : "w-6 h-6"} />
             </NavLink>
@@ -61,15 +59,15 @@ const SideBar = ({ isMobile = false }: SideBarProps) => {
         </IconToopTipWrapper>
 
         {/* Profile Avatar */}
-        <IconToopTipWrapper label={user.name}>
+        <IconToopTipWrapper label={user?.username || "Guest"}>
           <div
             className={`rounded-full overflow-hidden bg-gray-300 flex items-center justify-center ${
               isMobile ? "w-5 h-5" : "w-10 h-10"
             }`}
           >
-            {user.profileImage ? (
+            {user?.profile_picture ? (
               <img
-                src={user.profileImage}
+                src={user?.profile_picture}
                 alt="User Profile"
                 className="w-full h-full object-cover"
               />

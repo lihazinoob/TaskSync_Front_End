@@ -1,8 +1,8 @@
 import api from "@/Context/axios";
-import { useRef, useState} from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/Context/AuthContext";
-
+import { Puff } from "react-loader-spinner";
 interface LoginUserDataType {
   email: string;
   password: string;
@@ -42,9 +42,6 @@ export default function LoginForm() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
-
-  
-  
 
   // Function to handle the login form submission
   async function handleSubmit(e: React.FormEvent) {
@@ -132,17 +129,25 @@ export default function LoginForm() {
           </div>
 
           {/* Sign In Button */}
-          <button
+          {loading ? (
+            <div className="items-center justify-center flex pt-4">
+              <Puff
+                height="50"
+                width="50"
+                color="#3B82F6"
+                ariaLabel="puff-loading"
+              />
+            </div>
+          ) : (
+            <button
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer mt-4"
             type="submit"
             disabled={loading}
           >
-            {loading ? "Signing In" : "Sign IN"}
+            Sign In
           </button>
+          )}
         </form>
-
-        
-        
       </div>
     </>
   );
