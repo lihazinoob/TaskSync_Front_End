@@ -29,9 +29,33 @@ export interface ProjectListDataType {
   tasks: Task[];
 }
 
+// Interface for the data type User
+export interface User {
+  id: string;
+  name: string;
+  profile_picture: string | null;
+}
+
 // Local store state
 let projectList: ProjectListDataType[] = [];
 let syncInterval: NodeJS.Timeout | null = null;
+
+// Function to fetch all the users
+
+export const fetchAllUsers = async (): Promise<User[]> => {
+  try {
+    const response = await api.get("/allUserData");
+    return response.data.users.map((user: any) => ({
+      // Transfroming all the element of the response array
+      id: user.id.toString(),
+      name: user.name,
+      profile_picture: user.profile_picture || null,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    throw error;
+  }
+};
 
 // Fetch Project from the backend
 export const fetchProjects = async (): Promise<ProjectListDataType[]> => {
@@ -72,7 +96,7 @@ export const createProject = async (
   projectData: Omit<ProjectListDataType, "id" | "slack" | "tasks">
 ): Promise<ProjectListDataType> => {
   try {
-    console.log("createProject function called");
+    // console.log("createProject function called");
     // Sending the data over the backend
     const response = await api.post("/createProject", {
       name: projectData.name,
@@ -160,13 +184,15 @@ export const addSubtaskToTask = async (
     throw new Error("Task Not Found");
   }
   try {
-
-
     const requestBody = {
       title: newSubtask.title,
       completed: newSubtask.completed,
     };
-    console.log("addSubtaskToTask: Sending request to:", `/tasks/${taskId}/subtasks`, requestBody);
+    console.log(
+      "addSubtaskToTask: Sending request to:",
+      `/tasks/${taskId}/subtasks`,
+      requestBody
+    );
     const response = await api.post(`/tasks/${taskId}/subtasks`, {
       title: newSubtask.title,
     });
@@ -413,5 +439,11 @@ export const useProjectStore = () => {
     };
   }, []);
 
-  return { projects, addProject, addTask, addSubTask,toggleSubTaskCompletionStatus };
+  return {
+    projects,
+    addProject,
+    addTask,
+    addSubTask,
+    toggleSubTaskCompletionStatus,
+  };
 };

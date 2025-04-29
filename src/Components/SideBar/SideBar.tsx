@@ -77,7 +77,7 @@ const SideBar = ({ isMobile = false }: SideBarProps) => {
                   isMobile ? "text-xs" : "text-sm"
                 }`}
               >
-                {user.name ? user.name.charAt(0).toUpperCase() : "N"}
+                {user?.username ? user.username.charAt(0).toUpperCase() : "N"}
               </span>
             )}
           </div>
