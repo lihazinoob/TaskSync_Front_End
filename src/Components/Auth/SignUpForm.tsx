@@ -2,13 +2,13 @@ import api from "@/Context/axios";
 import { useRef, useState } from "react";
 import { useAuth } from "@/Context/AuthContext";
 import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
-
+import { Puff } from "react-loader-spinner";
 
 interface RegistrationUserDataType {
   username: string;
   email: string;
   password: string;
-  profile_picture?:string;
+  profile_picture?: string;
 }
 
 // Interface for form errors
@@ -83,11 +83,11 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
       username: usernameRef.current!.value,
       email: emailRef.current!.value,
       password: passwordRef.current!.value,
-      profile_picture:imageURL || ""
+      profile_picture: imageURL || "",
     };
 
     try {
-      console.log("FormData that is sent to the laravel backend",formData);
+      console.log("FormData that is sent to the laravel backend", formData);
       const { data } = await api.post("/register", formData);
       login(data.access_token);
       // call the triggerOnBoarding function here to trigger the onboarding screen
@@ -131,7 +131,6 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
     } catch (error) {
       console.log(error);
     }
-    
   }
 
   return (
@@ -230,16 +229,25 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
           </div>
 
           {/* Create Account Button */}
-          <button
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer mt-4"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ? "Creating Account..." : "Create Account"}
-          </button>
+          {loading ? (
+            <div className="items-center justify-center flex t-4">
+              <Puff
+                height="50"
+                width="50"
+                color="#3B82F6"
+                ariaLabel="puff-loading"
+              />
+            </div>
+          ) : (
+            <button
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition cursor-pointer mt-4"
+              type="submit"
+              disabled={loading}
+            >
+              Create Account
+            </button>
+          )}
         </form>
-
-        
       </div>
     </>
   );

@@ -1,5 +1,4 @@
 import api from "@/Context/axios";
-import GitHubIcon from "../../assets/GitHubIcon.svg";
 import { useRef, useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/Context/AuthContext";
@@ -44,26 +43,8 @@ export default function LoginForm() {
     return Object.keys(newErrors).length === 0;
   }
 
-  // Function to handle github authentication for logging in the user into the system
-  async function handleGitHubAuth() {
-    try {
-      setLoading(true);
-      const { data } = await api.get("/auth/github", {
-        params: {
-          redirect: `${window.location.origin}/auth/callback`,
-          state: "login",
-        },
-      });
-      console.log("Redirecting to GitHub:", data.url);
-      window.location.href = data.url;
-    } catch (error: any) {
-      console.error("GitHub Auth Error:", error);
-      setErrors({
-        github: "Failed to initiate GitHub Authentication",
-      });
-      setLoading(false);
-    }
-  }
+  
+  
 
   // Function to handle the login form submission
   async function handleSubmit(e: React.FormEvent) {
@@ -160,18 +141,8 @@ export default function LoginForm() {
           </button>
         </form>
 
-        <div className="items-center justify-center flex text-gray-400">OR</div>
-
-        {/* Google Icon */}
-
-        <div className="flex flex-row items-center justify-center">
-          <div
-            className="border-2 border-slate-200 px-4 py-1 rounded-lg cursor-pointer"
-            onClick={handleGitHubAuth}
-          >
-            <img src={GitHubIcon} alt="icon-google" />
-          </div>
-        </div>
+        
+        
       </div>
     </>
   );
