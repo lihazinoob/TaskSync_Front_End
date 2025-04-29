@@ -9,7 +9,7 @@ export default function AuthLayout({triggerOnBoarding}:AuthLayoutProps)
 {
   return(
     <>
-      <div className="h-screen bg-slate-100 flex flex-row px-16 py-8">
+      <div className="min-h-screen bg-slate-100 flex flex-row px-16 py-4">
         {/* Image Container of the SignUp Page */}
         <div className="flex-1/2">
           <AuthImage/>

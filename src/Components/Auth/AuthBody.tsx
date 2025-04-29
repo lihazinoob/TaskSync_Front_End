@@ -12,13 +12,13 @@ export default function AuthBody({triggerOnBoarding}:AuthLayoutProps) {
       
       <div className="w-full max-w-md px-8 py-8">
         {/* Logo */}
-        <div className="flex items-center justify-start mb-4 gap-2">
+        <div className="flex items-center justify-center mb-4 gap-2">
           <img src={CompanyLogo} alt="" />
           <div className="text-2xl font-semibold">TaskSync</div>
         </div>
 
         {/* Toggle Button */}
-        <div className="flex justify-start mt-12">
+        <div className="flex justify-center mt-12">
           <button
             onClick={() => setActiveTab("signup")}
             className={`px-8 py-2 rounded-sm font-semibold text-sm tracking-wider cursor-pointer ${

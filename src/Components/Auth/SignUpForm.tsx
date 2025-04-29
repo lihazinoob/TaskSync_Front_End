@@ -2,12 +2,13 @@ import api from "@/Context/axios";
 import { useRef, useState } from "react";
 import { useAuth } from "@/Context/AuthContext";
 import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
-import { error } from "console";
+
 
 interface RegistrationUserDataType {
   username: string;
   email: string;
   password: string;
+  profile_picture?:string;
 }
 
 // Interface for form errors
@@ -82,9 +83,11 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
       username: usernameRef.current!.value,
       email: emailRef.current!.value,
       password: passwordRef.current!.value,
+      profile_picture:imageURL || ""
     };
 
     try {
+      console.log("FormData that is sent to the laravel backend",formData);
       const { data } = await api.post("/register", formData);
       login(data.access_token);
       // call the triggerOnBoarding function here to trigger the onboarding screen
@@ -136,8 +139,8 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
       <div className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* User Image Upload Section*/}
-          <div className="items-center justify-center flex">
-            <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200">
+          <div className="items-center justify-center flex flex-col gap-4">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gray-200">
               {imageURL ? (
                 <img
                   src={imageURL}
@@ -151,9 +154,9 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
               )}
             </div>
 
-            <label className="ml-4 cursor-pointer">
-              <span className="text-2xl text-blue-600">
-                +
+            <label className="cursor-pointer bg-slate-200 px-2 py-1 rounded-lg text-blue-500 ">
+              <span className="text-sm">
+                Choose File
                 <input
                   type="file"
                   accept="image/*"
@@ -236,9 +239,7 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
           </button>
         </form>
 
-        <div className="items-center justify-center flex text-gray-400">OR</div>
-
-        {/* Google Icon */}
+        
       </div>
     </>
   );
