@@ -1,7 +1,8 @@
 import api from "@/Context/axios";
-import { useRef, useState} from "react";
+import { useRef, useState } from "react";
 import { useAuth } from "@/Context/AuthContext";
 import { AuthLayoutProps } from "@/Layout/Auth/AuthLayout";
+import { error } from "console";
 
 interface RegistrationUserDataType {
   username: string;
@@ -20,6 +21,9 @@ interface FormErrors {
 
 export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
   const { login } = useAuth();
+
+  // State for storing the image URL from cloudinary
+  const [imageURL, setImageURL] = useState<string | null>(null);
 
   // Refs for user data field
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -62,10 +66,6 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
     return Object.keys(newErrors).length === 0;
   }
 
-  
-
-  
-
   // the handler function to handle the submission logic
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -99,10 +99,71 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
     }
   }
 
+  async function handleImageUpload(event: any) {
+    const imageFile = event.target.files[0];
+    // Error handling
+    if (!imageFile) {
+      return;
+    }
+
+    // To send the image we need to create a FormData, because images are considered as binary
+    const data = new FormData();
+    // appending the data according to the kew value pair where "profile_picture" is the key
+    data.append("file", imageFile);
+    data.append("upload_preset", "Task_Sync");
+    data.append("cloud_name", "ddukqnbjm");
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/ddukqnbjm/image/upload",
+        {
+          method: "POST",
+          body: data,
+        }
+      );
+
+      const uploadedImageUrl = await response.json();
+      setImageURL(uploadedImageUrl.url);
+      // console.log(uploadedImageUrl);
+    } catch (error) {
+      console.log(error);
+    }
+    
+  }
+
   return (
     <>
       <div className="space-y-6">
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* User Image Upload Section*/}
+          <div className="items-center justify-center flex">
+            <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-200">
+              {imageURL ? (
+                <img
+                  src={imageURL}
+                  alt="Profile_Picture"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-gray-500">
+                  {/* Image Holder Section */}
+                </div>
+              )}
+            </div>
+
+            <label className="ml-4 cursor-pointer">
+              <span className="text-2xl text-blue-600">
+                +
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                />
+              </span>
+            </label>
+          </div>
+
           {/* UserName */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -178,8 +239,6 @@ export default function SignUpForm({ triggerOnBoarding }: AuthLayoutProps) {
         <div className="items-center justify-center flex text-gray-400">OR</div>
 
         {/* Google Icon */}
-
-        
       </div>
     </>
   );
