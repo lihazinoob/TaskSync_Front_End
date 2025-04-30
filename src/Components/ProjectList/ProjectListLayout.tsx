@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import SearchBarProjectList from "./SearchBarProjectList";
 import {
   ProjectListDataType,
@@ -12,11 +12,7 @@ function ProjectListLayout() {
   // Fetching the projects from the ProjectListItem using the custom hook
   const {projects} = useProjectStoreContext();
 
-  // Debug state changes
-  useEffect(() => {
-    console.log("Projects updated:", projects);
-  }, [projects]);
-
+  
   // State to store the selected category
   const [selectedCategory, setSelectedcategory] = useState("Active");
 

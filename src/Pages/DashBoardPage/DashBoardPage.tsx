@@ -1,14 +1,15 @@
 import NotificationLayer from "@/Components/Notification/NotificationLayer";
-function DashBoardPage()
-{
-  return(
+import { ProjectStoreProvider } from "@/Context/ProjectStoreContext";
+function DashBoardPage() {
+  return (
     <>
-    <div>
-      This is the dashboard page of a user
-      <NotificationLayer/>
-    </div>
+      <ProjectStoreProvider>
+        <div>
+          This is the dashboard page of a user
+          <NotificationLayer />
+        </div>
+      </ProjectStoreProvider>
     </>
-
   );
 }
-export default DashBoardPage
+export default DashBoardPage;

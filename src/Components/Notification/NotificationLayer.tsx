@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -5,6 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+
+import { useProjectStoreContext } from "@/Context/ProjectStoreContext";
 
 const notifications = [
   {
@@ -22,6 +25,18 @@ const notifications = [
 ];
 
 export default function NotificationLayer() {
+
+  const {showNotifications,notification} = useProjectStoreContext();
+  
+
+  useEffect(() => {
+    async function getNotifications()
+    {
+      await showNotifications();
+    }
+    getNotifications();
+    
+  }, []);
   return (
     <>
       <Card className="w-[380px]">
@@ -31,7 +46,7 @@ export default function NotificationLayer() {
         </CardHeader>
 
         <CardContent className="grid gap-4">
-          {notifications.map((notification, index) => (
+          {notification.map((notification, index) => (
             <div
               key={index}
               className="mb-4 grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0"
@@ -39,10 +54,10 @@ export default function NotificationLayer() {
               <span className="flex h-2 w-2 translate-y-1 rounded-full bg-blue-600" />
               <div className="space-y-1">
                 <p className="text-sm font-medium leading-none">
-                  {notification.title}
+                  {notification.type}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {notification.description}
+                  {notification.message}
                 </p>
               </div>
             </div>

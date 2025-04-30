@@ -36,9 +36,22 @@ export interface User {
   profile_picture: string | null;
 }
 
+// Data type for notification
+export interface Notification { 
+  id:number;
+  user_id:number;
+  project_id:number;
+  type:string;
+  message:string;
+  // If the message has been read or not
+  read:boolean;
+
+}
+
 // Local store state
 let projectList: ProjectListDataType[] = [];
 let syncInterval: NodeJS.Timeout | null = null;
+let notificationList:Notification[] =[];
 
 // Function to fetch all the users
 export const fetchAllUsers = async (): Promise<User[]> => {
@@ -57,15 +70,18 @@ export const fetchAllUsers = async (): Promise<User[]> => {
 };
 
 // Function to communicate with backend for inviting a user
-export const inviteUser = async(projectIDstring: string | undefined,userID:string): Promise<void> => {
+export const inviteUser = async (
+  projectIDstring: string | undefined,
+  userID: string
+): Promise<void> => {
   try {
-    console.log("The ProjectID",projectIDstring);
-    console.log("The userID",userID);
+    console.log("The ProjectID", projectIDstring);
+    console.log("The userID", userID);
     const projectID = Number(projectIDstring);
-    const response = await api.post(`/projects/${projectID}/invite`,{
-      user_id : userID
+    const response = await api.post(`/projects/${projectID}/invite`, {
+      user_id: userID,
     });
-    console.log("Response from inviteUser function",response.data);
+    console.log("Response from inviteUser function", response.data);
   } catch (error) {
     console.log("An unnecessary error occured");
   }
@@ -269,6 +285,26 @@ export const updateSubTaskCompletionStatus = async (
   }
 };
 
+
+// Function that communicates with backend to fetch the notifications
+export const fetchNotificationfromBackend = async():Promise<Notification[]> =>  {
+  try {
+    const response = await api.get('/fetchAllNotifications');
+    notificationList = response.data.notifications.map((notification:any)=>({
+      id:notification.id,
+      user_id:notification.user_id,
+      project_id:notification.project_id,
+      type:notification.type,
+      message:notification.message,
+      read:notification.read
+    }));
+    return notificationList;
+  } catch (error) {
+    console.error("Failed to create task:", error);
+    throw error;
+  }
+}
+
 // Sync local Store with backend
 
 export const syncWithBackend = async (): Promise<void> => {
@@ -307,6 +343,7 @@ export const useProjectStore = () => {
   // const { isAuthenticated } = useAuth();
   const [projects, setProjects] = useState<ProjectListDataType[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(0);
+  const [notification,setNotification] = useState<Notification[]>([]);
 
   // Function to add a new project and update state
   const addProject = async (
@@ -427,6 +464,21 @@ export const useProjectStore = () => {
     }
   };
 
+
+  // Wrapper Function to fetch the notifications of a user
+  const showNotifications = async () => {
+    console.log("Inside the wrapper function of notification fetching");
+    try {
+      const notificationData = await fetchNotificationfromBackend();
+      // console.log(notificationData);
+      setNotification(notificationData);
+
+    } catch (error) {
+      console.error("Error toggling subtask:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     // Initial fetch
     fetchProjects().then((fetchedProjects) => {
@@ -459,5 +511,7 @@ export const useProjectStore = () => {
     addTask,
     addSubTask,
     toggleSubTaskCompletionStatus,
+    notification,
+    showNotifications
   };
 };
