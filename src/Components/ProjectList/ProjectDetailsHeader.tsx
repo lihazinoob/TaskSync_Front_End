@@ -34,6 +34,10 @@ export default function ProjectDetailsHeader() {
   // State to store the fetched users
   const [users, setUsers] = useState<User[]>([]);
 
+  // State to track if the invitation process is in progress or not
+  const [invitingUserId, setInvitingUserId] = useState<string | null>(null);
+
+
   // State dor the users that will be filtered along with search options. Subset of users
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
 
@@ -91,6 +95,7 @@ export default function ProjectDetailsHeader() {
 
   async function handleInviteUserToProject(userID: string) {
     try {
+      setInvitingUserId(userID);
       await inviteUser(project?.id,userID);
       
       // Show success notification
@@ -107,11 +112,10 @@ export default function ProjectDetailsHeader() {
         duration: 3000,
         icon: <XCircle className="h-5 w-5 text-red-500" />,
       });
-
     }
-    
-
-
+    finally{
+      setInvitingUserId(null);
+    }
   }
 
   // Mock data for avatars (replace with actual project data later)
@@ -228,8 +232,9 @@ export default function ProjectDetailsHeader() {
                       <Button
                         className="text-sm px-2 py-1 cursor-pointer"
                         onClick={() => handleInviteUserToProject(user.id)}
+                        disabled={invitingUserId !== null}
                       >
-                        Add
+                        {invitingUserId === user.id ? "Adding..." : "Add"}
                       </Button>
                     </div>
                   ))
