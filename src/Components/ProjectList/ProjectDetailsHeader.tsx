@@ -1,9 +1,11 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
+  ProjectListDataType,
   User,
   fetchAllUsers,
   fetchProjectBySlack,
+  inviteUser,
 } from "@/CONSTANTS/ProjectListItems";
 import { Star, Plus, Search } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
@@ -14,11 +16,13 @@ import {
   DropdownMenuLabel,
 } from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
-
+import { Button } from "../ui/button";
 
 export default function ProjectDetailsHeader() {
   const { slack } = useParams<{ slack: string }>();
-  const project = slack ? fetchProjectBySlack(slack) : undefined;
+
+  // State for setting the project Data inside this component
+  const [project,setProject] = useState<ProjectListDataType|null>(null);
 
   // state for toggling the star icon
   const [isStarred, setIsSStarred] = useState(false);
@@ -32,6 +36,16 @@ export default function ProjectDetailsHeader() {
 
   // State for the search query. Used for searching the between the registered user
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Use State hook to fetch project data when the component mounts
+
+  useEffect(()=>{
+    if(slack)
+    {
+      const projectData = fetchProjectBySlack(slack);
+      setProject(projectData || null);
+    }
+  },[])
 
   // function for handling the starToggle
   function handleStarToggle() {
@@ -69,6 +83,16 @@ export default function ProjectDetailsHeader() {
       return () => clearTimeout(timer);
     }
   }, [showAlert]);
+
+  // Handler function for this component to add a User to a Project
+
+  async function handleInviteUserToProject(userID: string) {
+    // console.log(typeof(userID));
+    // console.log(project?.id);
+    await inviteUser(project?.id,userID);
+
+  }
+
   // Mock data for avatars (replace with actual project data later)
   const avatars = [
     "https://randomuser.me/api/portraits/women/1.jpg",
@@ -179,6 +203,13 @@ export default function ProjectDetailsHeader() {
                         />
                         <span>{user.name}</span>
                       </div>
+
+                      <Button
+                        className="text-sm px-2 py-1 cursor-pointer"
+                        onClick={() => handleInviteUserToProject(user.id)}
+                      >
+                        Add
+                      </Button>
                     </div>
                   ))
                 )}

@@ -41,7 +41,6 @@ let projectList: ProjectListDataType[] = [];
 let syncInterval: NodeJS.Timeout | null = null;
 
 // Function to fetch all the users
-
 export const fetchAllUsers = async (): Promise<User[]> => {
   try {
     const response = await api.get("/allUserData");
@@ -54,6 +53,20 @@ export const fetchAllUsers = async (): Promise<User[]> => {
   } catch (error) {
     console.error("Failed to fetch users:", error);
     throw error;
+  }
+};
+
+// Function to communicate with backend for inviting a user
+export const inviteUser = async(projectID: string | undefined,userID:string): Promise<void> => {
+  try {
+    console.log("The ProjectID",projectID);
+    console.log("The userID",userID);
+    const response = await api.post(`/projects/${projectID}/invite`,{
+      user_id : userID
+    });
+    console.log("Response from inviteUser function",response.data);
+  } catch (error) {
+    console.log("An unnecessary error occured");
   }
 };
 
