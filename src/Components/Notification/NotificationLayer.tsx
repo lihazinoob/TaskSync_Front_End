@@ -8,41 +8,39 @@ import {
 } from "../ui/card";
 
 import { useProjectStoreContext } from "@/Context/ProjectStoreContext";
-
-const notifications = [
-  {
-    title: "Your call has been confirmed.",
-    description: "1 hour ago",
-  },
-  {
-    title: "You have a new message!",
-    description: "1 hour ago",
-  },
-  {
-    title: "Your subscription is expiring soon!",
-    description: "2 hours ago",
-  },
-];
+import { Button } from "../ui/button";
+import { acceptInvitation } from "@/CONSTANTS/ProjectListItems";
 
 export default function NotificationLayer() {
+  const { showNotifications, notification } = useProjectStoreContext();
 
-  const {showNotifications,notification} = useProjectStoreContext();
-  
+
 
   useEffect(() => {
-    async function getNotifications()
-    {
+    async function getNotifications() {
       await showNotifications();
     }
     getNotifications();
-    
   }, []);
+
+  // function for handling acceptInvitation
+  async function handleInvitationAccept(userID:number,projectID:number)
+  { 
+    await acceptInvitation(userID,projectID);
+  }
   return (
     <>
       <Card className="w-[380px]">
         <CardHeader>
           <CardTitle>Notifications</CardTitle>
-          <CardDescription>You have 3 unread messages.</CardDescription>
+          <CardDescription>
+            You have
+            <span className="font-bold text-slate-950 tracking-widest">
+              {" "}
+              {notification.length}{" "}
+            </span>
+            unread messages.
+          </CardDescription>
         </CardHeader>
 
         <CardContent className="grid gap-4">
@@ -59,6 +57,16 @@ export default function NotificationLayer() {
                 <p className="text-sm text-muted-foreground">
                   {notification.message}
                 </p>
+                {notification.related_Project_Status === "pending" ? (
+                  <div className="flex items-center justify-end gap-4">
+                    <Button
+                    onClick={()=>handleInvitationAccept(notification.user_id,notification.project_id)}
+                    >Accept</Button>
+                    <Button variant={"destructive"}>Reject</Button>
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           ))}

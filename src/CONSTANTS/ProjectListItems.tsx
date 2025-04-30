@@ -37,21 +37,22 @@ export interface User {
 }
 
 // Data type for notification
-export interface Notification { 
-  id:number;
-  user_id:number;
-  project_id:number;
-  type:string;
-  message:string;
+export interface Notification {
+  id: number;
+  user_id: number;
+  project_id: number;
+  type: string;
+  message: string;
   // If the message has been read or not
-  read:boolean;
-
+  read: boolean;
+  // The Status of the related project. If not then it will be null
+  related_Project_Status: string | null;
 }
 
 // Local store state
 let projectList: ProjectListDataType[] = [];
 let syncInterval: NodeJS.Timeout | null = null;
-let notificationList:Notification[] =[];
+let notificationList: Notification[] = [];
 
 // Function to fetch all the users
 export const fetchAllUsers = async (): Promise<User[]> => {
@@ -285,25 +286,45 @@ export const updateSubTaskCompletionStatus = async (
   }
 };
 
-
 // Function that communicates with backend to fetch the notifications
-export const fetchNotificationfromBackend = async():Promise<Notification[]> =>  {
+export const fetchNotificationfromBackend = async (): Promise<
+  Notification[]
+> => {
   try {
-    const response = await api.get('/fetchAllNotifications');
-    notificationList = response.data.notifications.map((notification:any)=>({
-      id:notification.id,
-      user_id:notification.user_id,
-      project_id:notification.project_id,
-      type:notification.type,
-      message:notification.message,
-      read:notification.read
+    const response = await api.get("/fetchAllNotifications");
+    notificationList = response.data.notifications.map((notification: any) => ({
+      id: notification.id,
+      user_id: notification.user_id,
+      project_id: notification.project_id,
+      type: notification.type,
+      message: notification.message,
+      read: notification.read,
+      related_Project_Status: notification.status,
     }));
     return notificationList;
   } catch (error) {
     console.error("Failed to create task:", error);
     throw error;
   }
-}
+};
+
+// Function that communicates with backend for accepting the project invitation
+export const acceptInvitation = async (
+  userID: number,
+  projectID: number
+): Promise<void> => {
+  try {
+    
+    const response = await api.post("/projects/accept-invitation", {
+      user_id: userID,
+      project_id: projectID,
+    });
+    console.log('Invitation accepted:', response.data.message);
+  } catch (error) {
+    console.error("Failed to accept invitation:", error);
+    throw error;
+  }
+};
 
 // Sync local Store with backend
 
@@ -343,7 +364,7 @@ export const useProjectStore = () => {
   // const { isAuthenticated } = useAuth();
   const [projects, setProjects] = useState<ProjectListDataType[]>([]);
   const [lastUpdate, setLastUpdate] = useState<number>(0);
-  const [notification,setNotification] = useState<Notification[]>([]);
+  const [notification, setNotification] = useState<Notification[]>([]);
 
   // Function to add a new project and update state
   const addProject = async (
@@ -464,15 +485,13 @@ export const useProjectStore = () => {
     }
   };
 
-
   // Wrapper Function to fetch the notifications of a user
   const showNotifications = async () => {
     console.log("Inside the wrapper function of notification fetching");
     try {
       const notificationData = await fetchNotificationfromBackend();
-      // console.log(notificationData);
+      console.log(notificationData);
       setNotification(notificationData);
-
     } catch (error) {
       console.error("Error toggling subtask:", error);
       throw error;
@@ -512,6 +531,6 @@ export const useProjectStore = () => {
     addSubTask,
     toggleSubTaskCompletionStatus,
     notification,
-    showNotifications
+    showNotifications,
   };
 };
