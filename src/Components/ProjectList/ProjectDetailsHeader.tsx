@@ -17,6 +17,9 @@ import {
 } from "../ui/dropdown-menu";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
+import { Toaster } from "sonner";
+import { toast } from "sonner";
+import { CheckCircle2,XCircle} from "lucide-react";
 
 export default function ProjectDetailsHeader() {
   const { slack } = useParams<{ slack: string }>();
@@ -45,7 +48,7 @@ export default function ProjectDetailsHeader() {
       const projectData = fetchProjectBySlack(slack);
       setProject(projectData || null);
     }
-  },[])
+  },[slack])
 
   // function for handling the starToggle
   function handleStarToggle() {
@@ -87,9 +90,27 @@ export default function ProjectDetailsHeader() {
   // Handler function for this component to add a User to a Project
 
   async function handleInviteUserToProject(userID: string) {
-    // console.log(typeof(userID));
-    // console.log(project?.id);
-    await inviteUser(project?.id,userID);
+    try {
+      await inviteUser(project?.id,userID);
+      
+      // Show success notification
+      toast.success("Success",{
+        description: "The user has been invited to join this project.",
+        duration: 3000,
+        icon: <CheckCircle2 className="h-5 w-5 text-slate-900" />,
+      });
+
+    } catch (error) {
+      // Show error notification with Sonner
+      toast.error("Invitation failed", {
+        description: "There was a problem sending the invitation. Please try again.",
+        duration: 3000,
+        icon: <XCircle className="h-5 w-5 text-red-500" />,
+      });
+
+    }
+    
+
 
   }
 
@@ -218,6 +239,9 @@ export default function ProjectDetailsHeader() {
           </div>
         </div>
       </div>
+
+      {/* Toaster Component to show the message */}
+      <Toaster position="bottom-right" richColors closeButton/>
     </>
   );
 }

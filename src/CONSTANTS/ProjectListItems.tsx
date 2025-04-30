@@ -57,10 +57,11 @@ export const fetchAllUsers = async (): Promise<User[]> => {
 };
 
 // Function to communicate with backend for inviting a user
-export const inviteUser = async(projectID: string | undefined,userID:string): Promise<void> => {
+export const inviteUser = async(projectIDstring: string | undefined,userID:string): Promise<void> => {
   try {
-    console.log("The ProjectID",projectID);
+    console.log("The ProjectID",projectIDstring);
     console.log("The userID",userID);
+    const projectID = Number(projectIDstring);
     const response = await api.post(`/projects/${projectID}/invite`,{
       user_id : userID
     });
